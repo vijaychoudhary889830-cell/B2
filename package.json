@@ -1,0 +1,41 @@
+{
+  "name": "spidey-bot",
+  "version": "1.0.0",
+  "description": "Discord bot (anti-nuke, automod, tickets, giveaways, music) with a web dashboard and premium plans",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@discord-player/extractor": "^7.1.0",
+    "@discordjs/voice": "^0.19.2",
+    "@snazzah/davey": "^0.1.12",
+    "bgutils-js": "latest",
+    "discord-api-types": "^0.38.0",
+    "discord-player": "^7.1.0",
+    "discord-player-youtubei": "latest",
+    "discord.js": "^14.16.0",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "ffmpeg-static": "^5.3.0",
+    "google-tts-api": "^2.0.2",
+    "googlevideo": "latest",
+    "jsdom": "latest",
+    "libsodium-wrappers": "^0.8.4",
+    "mediaplex": "^1.0.0",
+    "opusscript": "^0.0.8",
+    "passport": "^0.7.0",
+    "passport-discord": "^0.1.4",
+    "simple-ytdl-core": "latest",
+    "undici": "latest",
+    "youtubei.js": "latest"
+  },
+  "overrides": {
+    "youtubei.js": "$youtubei.js"
+  }
+}

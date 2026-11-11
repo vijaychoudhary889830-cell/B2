@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["...", "ffmpeg"]
+
+[phases.install]
+cmds = ["npm ci --omit=dev --no-audit --no-fund"]
