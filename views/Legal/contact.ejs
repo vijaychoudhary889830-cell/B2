@@ -1,0 +1,18 @@
+<h1>Contact us</h1>
+<p class="meta">We're a small team and usually reply within 1-2 days.</p>
+
+<h2>Fastest way: the support server</h2>
+<p><% if (supportUrl) { %>Join our <a href="<%= supportUrl %>" target="_blank" rel="noopener">support server</a> and open a ticket or post in the help channel.<% } else { %>Our support server link will appear here soon.<% } %></p>
+
+<h2>Email</h2>
+<p><% if (supportEmail) { %><a href="mailto:<%= supportEmail %>"><%= supportEmail %></a><% } else { %>Email support isn't set up yet. Please use the support server.<% } %></p>
+
+<h2>Payments, Premium and refunds</h2>
+<p>Please include your Discord username, the server name or ID, the payment reference and a screenshot. <% if (premiumUrl) { %>You can reach us about Premium <a href="<%= premiumUrl %>" target="_blank" rel="noopener">here</a>.<% } %> See the <a href="/refund">Refund Policy</a> for what we cover.</p>
+
+<h2>Privacy and data requests</h2>
+<p>To ask about, correct or delete data we hold, contact us with your Discord user ID. Details are in our <a href="/privacy">Privacy Policy</a>.</p>
+
+<h2>Business details</h2>
+<p>Operated by <b><%= operatorName %></b>, India.</p>
+<p>Looking for quick answers first? Try the <a href="/support">Support page</a>.</p>

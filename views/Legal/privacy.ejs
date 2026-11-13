@@ -1,0 +1,52 @@
+<h1>Privacy Policy</h1>
+<p class="meta">Last updated: <%= updated %></p>
+<p>This policy explains what information <b><%= operatorName %></b> ("we", "us") collects when you use the SPIDEY Discord bot and dashboard, and how it is used.</p>
+
+<h2>1. Information we collect</h2>
+<p><b>When you log in to the dashboard</b> (through Discord login, with the <code>identify</code> and <code>guilds</code> permissions): your Discord user ID, username and avatar, and the list of servers you are in along with your permissions there. This is used to show you the servers you can manage and to check that you are allowed to change their settings.</p>
+<p><b>When the bot is in your server:</b> server and channel IDs, role IDs, user IDs, and the settings you configure (for example Antinuke, AutoMod, whitelists, log and welcome channels, ticket settings, reaction roles, banned words and allowed domains). Open ticket records are stored while the ticket exists.</p>
+<p><b>Messages:</b> the bot reads messages in real time so AutoMod and commands can work. We do not keep a database of message content. Where you turn on logging, the bot posts log entries to a channel in your own server.</p>
+<p><b>Payments:</b> when you buy Premium, the payment provider collects your payment details. <b>We never see or store your card number or bank details.</b> We keep a record of the payment ID, the server and Discord user it was for, the amount, the number of days granted and the time, so Premium can be activated once and supported later.</p>
+<p><b>Technical data:</b> like most websites, our hosting provider may log things like IP address and request details for security and troubleshooting. The dashboard uses a session cookie to keep you logged in.</p>
+
+<h2>2. How we use information</h2>
+<ul>
+  <li>to run the bot and dashboard and apply the settings you choose;</li>
+  <li>to verify you can manage a server, and to activate and support Premium;</li>
+  <li>to prevent abuse, fix bugs and keep the Service secure;</li>
+  <li>to respond to support requests.</li>
+</ul>
+<p>We do not sell your personal information and we don't use it for advertising.</p>
+
+<h2>3. Who we share it with</h2>
+<ul>
+  <li><b>Discord</b>, because the Service runs on it.</li>
+  <li><b>Payment provider</b>, to process Premium payments.</li>
+  <li><b>Hosting provider</b>, which stores the Service's data and runs the servers.</li>
+  <li>Authorities, if required by law or to protect rights and safety.</li>
+</ul>
+
+<h2>4. Cookies</h2>
+<p>We use only a session cookie that keeps you logged in. We don't use advertising or tracking cookies.</p>
+
+<h2>5. How long we keep data</h2>
+<p>Server settings are kept while the bot is in your server. You can ask us to delete a server's data after you remove the bot. Payment records are kept as long as needed for support, accounting and legal reasons.</p>
+
+<h2>6. Your choices</h2>
+<ul>
+  <li>Log out of the dashboard at any time, and revoke SPIDEY's access in Discord under Settings → Authorized Apps.</li>
+  <li>Remove the bot from your server to stop it processing that server.</li>
+  <li>Ask us to access, correct or delete your data using the details on our <a href="/contact">Contact page</a>.</li>
+</ul>
+
+<h2>7. Security</h2>
+<p>We take reasonable steps to protect data, but no online service is completely secure. Please protect your Discord account.</p>
+
+<h2>8. Children</h2>
+<p>The Service is not meant for anyone below the minimum age Discord requires in their country, and we don't knowingly collect their data.</p>
+
+<h2>9. Changes</h2>
+<p>We may update this policy. The date above will change when we do.</p>
+
+<h2>10. Contact</h2>
+<p>Privacy questions or requests: <% if (supportEmail) { %><a href="mailto:<%= supportEmail %>"><%= supportEmail %></a><% } else { %>our support server<% } %>, or via our <a href="/contact">Contact page</a>.</p>

@@ -1,0 +1,35 @@
+<h1>Refund &amp; Cancellation Policy</h1>
+<p class="meta">Last updated: <%= updated %></p>
+<p>Premium for SPIDEY is a digital service. It is switched on for your server as soon as your payment is confirmed. Here is how refunds work.</p>
+
+<div class="callout"><b>In short:</b> Premium is a one-time payment ($<%= priceUsd %> for <%= premiumDays %> days) that does not renew by itself, so there is nothing to cancel. Because it activates instantly, we generally don't refund it once it is active, except in the cases below.</div>
+
+<h2>When we will refund</h2>
+<ul>
+  <li><b>Charged but Premium not activated.</b> If money left your account and Premium did not turn on within 24 hours, we will activate it or refund you in full.</li>
+  <li><b>Duplicate payments.</b> If you were charged more than once for the same purchase, we refund the extra payment(s).</li>
+  <li><b>Wrong server by mistake.</b> If you paid for the wrong server and contact us within 24 hours before using any Premium features, we will move it to the correct server or refund you.</li>
+  <li><b>Problem we can't fix.</b> If a core Premium feature doesn't work and we are unable to fix it within 7 days of your report, we will refund the unused part of the period.</li>
+</ul>
+
+<h2>When we don't refund</h2>
+<ul>
+  <li>You changed your mind after Premium was activated and used.</li>
+  <li>The bot was removed, or your server was deleted, banned or lost.</li>
+  <li>Premium was removed because of a breach of our <a href="/terms">Terms of Service</a>.</li>
+  <li>Short downtime or maintenance that does not stop the Service from being usable.</li>
+</ul>
+
+<h2>How to ask for a refund</h2>
+<p>Contact us within <b>7 days</b> of the payment through the <% if (supportUrl) { %><a href="<%= supportUrl %>" target="_blank" rel="noopener">support server</a><% } else { %>support server<% } %><% if (supportEmail) { %> or at <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a><% } %>. Please include:</p>
+<ul>
+  <li>your Discord username and the server ID or name;</li>
+  <li>the payment ID or transaction reference and the date;</li>
+  <li>what went wrong, with a screenshot if possible.</li>
+</ul>
+
+<h2>How refunds are paid</h2>
+<p>Approved refunds go back to the original payment method (your card). We start the refund within <b>3 business days</b> of approving it, and it usually reaches your account within <b>5-7 business days</b>, depending on your bank.</p>
+
+<h2>Chargebacks</h2>
+<p>Please contact us before disputing a payment with your bank. We resolve genuine problems quickly, and a chargeback on a payment we would have refunded may lead to Premium being suspended.</p>

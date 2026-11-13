@@ -1,0 +1,58 @@
+<h1>Terms of Service</h1>
+<p class="meta">Last updated: <%= updated %></p>
+<p>These terms apply when you use the SPIDEY Discord bot, this website and its dashboard (together, the "Service"), operated by <b><%= operatorName %></b> ("we", "us"). By adding the bot to a server, logging in to the dashboard or buying Premium, you agree to these terms. If you don't agree, please don't use the Service.</p>
+
+<h2>1. What SPIDEY is</h2>
+<p>SPIDEY is a Discord bot that provides server protection and management tools such as Antinuke, AutoMod, logging, tickets, welcomer, reaction roles and music, along with a web dashboard to configure them.</p>
+
+<h2>2. Eligibility and your account</h2>
+<ul>
+  <li>You must follow <a href="https://discord.com/terms" target="_blank" rel="noopener">Discord's Terms of Service</a> and <a href="https://discord.com/guidelines" target="_blank" rel="noopener">Community Guidelines</a>, including Discord's minimum age for your country.</li>
+  <li>You log in to the dashboard with your Discord account. You are responsible for activity on your account.</li>
+  <li>You may only manage servers where you have Administrator or Manage Server permission.</li>
+</ul>
+
+<h2>3. Acceptable use</h2>
+<p>You agree not to:</p>
+<ul>
+  <li>use the Service to harass, scam, spam or harm others, or to break any law or Discord rule;</li>
+  <li>attempt to attack, overload, reverse engineer or gain unauthorised access to the Service or other servers' data;</li>
+  <li>abuse payment or key systems, including chargeback fraud, sharing or reselling Premium keys, or exploiting bugs;</li>
+  <li>use the bot's tools (for example Antinuke or AutoMod) to take action against people without the authority to do so in your server.</li>
+</ul>
+<p>We may remove the bot from a server, block an account or suspend Premium if these terms are broken.</p>
+
+<h2>4. Moderation tools are your responsibility</h2>
+<p>Antinuke and AutoMod can ban, kick, time out or remove content automatically, based on settings you choose. You are responsible for how you configure them and for actions taken in your server. No protection tool is perfect, and we can't promise that every raid, nuke or spam attempt will be stopped.</p>
+
+<h2>5. Premium</h2>
+<ul>
+  <li>Premium is a paid digital feature that applies to <b>one server</b> for a set period (currently <b><%= premiumDays %> days</b> for <b>$<%= priceUsd %></b>). It is a one-time payment and does not renew automatically.</li>
+  <li>Premium is activated for the server chosen at checkout, on the Discord account used to pay. Please check the server name before paying.</li>
+  <li>Prices, duration and Premium features may change. Changes won't affect a period you have already paid for.</li>
+  <li>Payments are handled by a third-party payment provider. Refunds are covered in our <a href="/refund">Refund Policy</a>.</li>
+</ul>
+
+<h2>6. Availability</h2>
+<p>We try to keep SPIDEY online but provide it "as is" and "as available". The bot or dashboard may be down for maintenance, updates or reasons outside our control, and features may change or be removed. Downtime does not by itself entitle you to a refund.</p>
+
+<h2>7. Intellectual property</h2>
+<p>The SPIDEY name, logo, website and code belong to us or our licensors. You get a limited, non-exclusive right to use the Service while following these terms. Content you create in your server stays yours.</p>
+
+<h2>8. Third-party services</h2>
+<p>SPIDEY relies on Discord and, for payments and some features, other providers. We are not responsible for their services, outages or policies.</p>
+
+<h2>9. Limitation of liability</h2>
+<p>To the extent permitted by law, we are not liable for indirect or consequential losses, lost data, lost profits, or damage to your server or community arising from use of the Service. Our total liability for any claim is limited to the amount you paid us for Premium in the 3 months before the claim.</p>
+
+<h2>10. Ending use</h2>
+<p>You can stop using the Service at any time by removing the bot from your server. We may suspend or end access if you break these terms or to protect the Service or other users.</p>
+
+<h2>11. Changes to these terms</h2>
+<p>We may update these terms. The "last updated" date above will change, and continued use after an update means you accept it.</p>
+
+<h2>12. Governing law</h2>
+<p>These terms are governed by the laws of India. Any dispute will be handled in the courts of India.</p>
+
+<h2>13. Contact</h2>
+<p>Questions about these terms? See our <a href="/contact">Contact page</a> or reach us via the <% if (supportUrl) { %><a href="<%= supportUrl %>" target="_blank" rel="noopener">support server</a><% } else { %>support server<% } %>.</p>
