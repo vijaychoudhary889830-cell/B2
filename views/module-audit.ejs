@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Logs — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+<style>
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); font-size: 13px; text-decoration: none; background: rgba(0,0,0,.35); }
+  .tab.on { color: #fff; border-color: var(--red2); }
+  .log-row { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .log-row:last-child { border-bottom: 0; }
+  .log-av { width: 34px; height: 34px; border-radius: 50%; background: #222; flex-shrink: 0; object-fit: cover; }
+  .log-main { min-width: 0; flex: 1; font-size: 13.5px; line-height: 1.45; word-break: break-word; }
+  .log-main b { color: var(--text); }
+  .log-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; background: rgba(225,29,46,.18); color: var(--red2); margin-right: 6px; }
+  .chip.bad { background: rgba(255,255,255,.08); color: var(--muted); }
+  .empty { color: var(--muted); padding: 18px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'audit' }) %>
+<%- include('partials/topbar', { pageLabel: 'Audit Logs' }) %>
+
+  <div class="glass hero">
+    <div class="eyebrow">Audit Logs</div>
+    <h1><%= guildName %></h1>
+    <p>Live from Discord's own audit log, plus every SPIDEY command used here.</p>
+  </div>
+
+  <div class="tabs">
+    <a class="tab <%= tab === 'discord' ? 'on' : '' %>" href="/dashboard/<%= guildId %>/audit">Discord audit log</a>
+    <a class="tab <%= tab === 'commands' ? 'on' : '' %>" href="/dashboard/<%= guildId %>/audit?tab=commands">Bot commands</a>
+  </div>
+
+  <div class="glass panel">
+  <% if (tab === 'commands') { %>
+    <div class="panel-head"><h2>Recent bot commands</h2></div>
+    <% if (!commands.length) { %><div class="empty">No commands used since the bot last restarted.</div><% } %>
+    <% commands.forEach(function (c) { %>
+      <div class="log-row">
+        <div class="log-main">
+          <span class="chip <%= c.ok ? '' : 'bad' %>"><%= c.ok ? 'OK' : 'FAILED' %></span><b><%= c.userTag %></b> ran <code><%= c.text %></code>
+          <div class="log-sub"><%= c.source === 'prefix' ? 'Prefix' : 'Slash' %><%= c.channelName ? ' • #' + c.channelName : '' %><%= c.ms != null ? ' • ' + c.ms + 'ms' : '' %> • <%= new Date(c.at).toLocaleString('en-GB', { timeZone: 'UTC' }) %> UTC</div>
+        </div>
+      </div>
+    <% }); %>
+  <% } else { %>
+    <div class="panel-head"><h2>Latest 50 events</h2></div>
+    <% if (auditError) { %><div class="empty"><%= auditError %></div><% } %>
+    <% if (!auditError && !entries.length) { %><div class="empty">Nothing in the audit log yet.</div><% } %>
+    <% entries.forEach(function (e) { %>
+      <div class="log-row">
+        <% if (e.avatar) { %><img class="log-av" src="<%= e.avatar %>" alt=""><% } else { %><div class="log-av"></div><% } %>
+        <div class="log-main">
+          <span class="chip"><%= e.action %></span><b><%= e.executor %></b><%= e.target ? ' → ' + e.target : '' %>
+          <% if (e.reason) { %><div class="log-sub">Reason: <%= e.reason %></div><% } %>
+          <div class="log-sub"><%= new Date(e.at).toLocaleString('en-GB', { timeZone: 'UTC' }) %> UTC</div>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
+  </div>
+
+<%- include('partials/foot') %>
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<title>Support — SPIDEY</title>
+<meta name="description" content="Get help with SPIDEY: join the support server, read quick fixes, and find answers to common questions.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #08060a; --ink2: #0f0c12; --panel: #130f16; --line: rgba(255,255,255,0.09);
+    --red: #ff3b4e; --red-soft: #ff8a96; --ice: #8fd8ff; --ok: #3ddc84;
+    --text: #f5f1f3; --muted: #a79fa6;
+    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--text); font-family: var(--body); line-height: 1.55; min-height: 100vh;
+    background: radial-gradient(900px 520px at 8% -8%, rgba(255,59,78,0.20), transparent 60%), var(--ink);
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; border-radius: 6px; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; max-width: 1120px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 19px; text-decoration: none; }
+  .brand-logo { width: 32px; height: 32px; border-radius: 9px; object-fit: cover; border: 1px solid var(--line); }
+  .nav-links { display: flex; align-items: center; gap: 26px; }
+  .nav-links a { text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); transition: color .15s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--text); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 20px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; border: 1px solid transparent; transition: transform .15s, background .15s, border-color .15s; }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--red); color: #1a0306; }
+  .btn-primary:hover { background: #ff5566; }
+  .nav-links a.btn-primary { color: #1a0306; }
+  .btn-ghost { border-color: var(--line); color: var(--text); background: rgba(255,255,255,0.03); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.28); }
+  .hamburger { display: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); color: var(--text); font-size: 18px; cursor: pointer; }
+
+  .drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 30; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 270px; z-index: 40; background: var(--ink2); border-left: 1px solid var(--line); padding: 22px 20px; transform: translateX(100%); transition: transform .25s ease; display: flex; flex-direction: column; gap: 2px; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-overlay.open { display: block; }
+  .drawer a { text-decoration: none; padding: 13px 6px; font-weight: 500; font-size: 15px; border-bottom: 1px solid var(--line); }
+  .drawer .btn { margin-top: 16px; border: none; }
+  .drawer-close { align-self: flex-end; background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; margin-bottom: 8px; }
+  @media (max-width: 760px) { .nav-links { display: none; } .hamburger { display: block; } }
+
+  .hero { padding: 56px 0 34px; text-align: center; }
+  .eyebrow { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--red-soft); margin-bottom: 14px; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 14px; }
+  .lead { color: var(--muted); font-size: 16px; max-width: 540px; margin: 0 auto 26px; }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0 8px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+  .card p { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+  .card a.link { color: var(--red-soft); font-size: 13.5px; font-weight: 700; text-decoration: none; }
+  .card a.link:hover { text-decoration: underline; }
+
+  h2 { font-family: var(--display); font-size: 24px; font-weight: 800; margin: 46px 0 14px; }
+  .fix { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 20px; }
+  .fix .row { padding: 16px 0; border-top: 1px solid var(--line); }
+  .fix .row:first-child { border-top: none; }
+  .fix h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+  .fix p { margin: 0; color: var(--muted); font-size: 14px; }
+  code { background: rgba(255,255,255,0.07); border-radius: 5px; padding: 1px 6px; font-size: 13px; color: var(--ice); }
+
+  details.faq { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; }
+  details.faq summary { list-style: none; cursor: pointer; padding: 16px 18px; font-weight: 700; font-size: 14.5px; display: flex; justify-content: space-between; gap: 12px; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq .chev { color: var(--muted); transition: transform .15s ease; flex-shrink: 0; }
+  details.faq[open] .chev { transform: rotate(180deg); }
+  details.faq .ans { padding: 0 18px 16px; color: var(--muted); font-size: 14px; }
+
+  .help-cta { margin: 46px 0 0; text-align: center; background: linear-gradient(180deg, rgba(255,59,78,0.12), rgba(255,59,78,0.03)); border: 1px solid rgba(255,59,78,0.28); border-radius: 16px; padding: 30px 22px; }
+  .help-cta h2 { margin: 0 0 8px; font-size: 22px; }
+  .help-cta p { color: var(--muted); margin: 0 auto 18px; max-width: 460px; font-size: 14.5px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; counter-reset: s; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; counter-increment: s; }
+  .step::before { content: counter(s); display: inline-flex; width: 26px; height: 26px; border-radius: 8px; background: rgba(255,59,78,0.16); color: var(--red-soft); font-weight: 800; font-size: 13px; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .step h3 { margin: 0 0 4px; font-size: 15px; }
+  .step p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .list { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+  .list li { margin: 6px 0; }
+  .notice { border: 1px solid rgba(143,216,255,0.28); background: rgba(143,216,255,0.06); border-radius: 12px; padding: 14px 16px; color: var(--muted); font-size: 13.5px; margin-top: 14px; }
+  .notice b { color: var(--text); }
+  footer { margin-top: 70px; border-top: 1px solid var(--line); padding: 26px 0; color: var(--muted); font-size: 13px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer .wrap > div:last-child { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  footer a { text-decoration: none; margin-left: 0; }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 760px) { .grid, .steps, .two { grid-template-columns: 1fr; } .hero { padding-top: 36px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } html { scroll-behavior: auto; } }
+  /* Shop icon, top right */
+  .nav-actions { display: flex; align-items: center; gap: 10px; }
+  .nav-icon { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); color: var(--text); display: flex; align-items: center; justify-content: center; text-decoration: none; transition: border-color .15s, color .15s; }
+  .nav-icon:hover { border-color: rgba(255,59,78,0.6); color: var(--red-soft); }
+  /* Raise a ticket (email form) */
+  .ticket { margin-top: 46px; display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; align-items: start; }
+  .ticket-card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 24px; }
+  .ticket-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .ticket-head h2 { margin: 0; font-size: 24px; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text); border: 1px solid var(--line); background: rgba(255,255,255,0.03); border-radius: 999px; padding: 6px 12px; white-space: nowrap; }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #ffb020; }
+  .tf { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tf .full { grid-column: 1 / -1; }
+  .tf label { display: block; font-size: 12.5px; font-weight: 700; margin-bottom: 8px; }
+  .tf label small { font-weight: 400; color: var(--muted); }
+  .tf input, .tf select, .tf textarea { width: 100%; font: inherit; font-size: 14px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 15px 16px; transition: border-color .15s, box-shadow .15s; }
+  .tf textarea { min-height: 150px; resize: vertical; }
+  .tf input::placeholder, .tf textarea::placeholder { color: #6f6770; }
+  .tf select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 40px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23a79fa6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>"); background-repeat: no-repeat; background-position: right 16px center; }
+  .tf select:invalid { color: #6f6770; }
+  .tf select option { color: var(--text); background: var(--panel); }
+  .tf input:focus, .tf select:focus, .tf textarea:focus { outline: none; border-color: rgba(255,59,78,0.65); box-shadow: 0 0 0 3px rgba(255,59,78,0.14); }
+  .tf-note { margin: 16px 0 16px; font-size: 12.5px; color: var(--muted); }
+  .tf-note a { color: var(--red-soft); text-decoration: none; }
+  .tf-submit { width: 100%; padding: 16px; font-size: 14.5px; border: none; cursor: pointer; font-family: inherit; }
+  .tf-msg.ok { color: var(--ok); }
+  .tf input:-webkit-autofill, .tf textarea:-webkit-autofill { -webkit-text-fill-color: var(--text); caret-color: var(--text); -webkit-box-shadow: 0 0 0 1000px var(--ink) inset; border-color: var(--line); }
+  .tf-msg { margin-top: 12px; font-size: 13px; color: var(--red-soft); min-height: 1em; }
+  .side-card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .side-card + .side-card { margin-top: 14px; }
+  .side-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,59,78,0.14); border: 1px solid rgba(255,59,78,0.3); color: var(--red-soft); display: flex; align-items: center; justify-content: center; font-weight: 800; margin-bottom: 16px; }
+  .side-card h3 { margin: 0 0 8px; font-size: 18px; font-family: var(--display); }
+  .side-card p { margin: 0; color: var(--muted); font-size: 13px; }
+  .side-card hr { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
+  a.side-link { display: flex; align-items: center; gap: 14px; text-decoration: none; transition: border-color .15s; }
+  a.side-link:hover { border-color: rgba(255,59,78,0.5); }
+  a.side-link .side-icon { margin: 0; flex-shrink: 0; }
+  a.side-link h3 { font-size: 14px; margin: 0 0 2px; font-family: var(--body); }
+  a.side-link p { font-size: 12px; }
+  a.side-link .arrow { margin-left: auto; color: var(--red-soft); }
+  @media (max-width: 760px) { .ticket { grid-template-columns: 1fr; } .tf { grid-template-columns: 1fr; } .ticket-card { padding: 18px; } .ticket-head { flex-direction: column-reverse; align-items: flex-start; } }
+</style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt=""> SPIDEY</a>
+    <div class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/status">Status</a>
+      <a href="/about">About</a>
+      <a href="/documentation">Docs</a>
+      <a href="/support" class="on">Support</a>
+      <% if (user) { %><a href="/dashboard" class="btn btn-primary">Open dashboard</a>
+      <% } else { %><a href="/login" class="btn btn-primary">Log in with Discord</a><% } %>
+    </div>
+    <div class="nav-actions"><%- include('partials/home-btn') %><a class="nav-icon" href="/shop" aria-label="Shop" title="Shop"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></a><button class="hamburger" aria-label="Open menu" onclick="toggleDrawer(true)">☰</button></div>
+  </nav>
+
+  <div class="drawer-overlay" id="overlay" onclick="toggleDrawer(false)"></div>
+  <div class="drawer" id="drawer">
+    <button class="drawer-close" aria-label="Close menu" onclick="toggleDrawer(false)">✕</button>
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/status">Status</a>
+    <a href="/about">About</a>
+    <a href="/documentation">Documentation</a>
+    <a href="/support">Support</a>
+    <% if (user) { %><a href="/dashboard" class="btn btn-primary">Open dashboard</a>
+    <% } else { %><a href="/login" class="btn btn-primary">Log in with Discord</a><% } %>
+  </div>
+
+  <main class="wrap">
+    <section class="hero">
+      <span class="eyebrow">Support</span>
+      <h1>Need a hand with SPIDEY?</h1>
+      <p class="lead">Check the quick fixes below first. If you're still stuck, our team will help you in the support server.</p>
+      <div class="cta">
+        <% if (supportUrl) { %><a class="btn btn-primary" href="<%= supportUrl %>" target="_blank" rel="noopener">Join support server</a><% } %>
+        <% if (inviteUrl) { %><a class="btn btn-ghost" href="<%= inviteUrl %>" target="_blank" rel="noopener">Add SPIDEY</a><% } %>
+        <a class="btn btn-ghost" href="/status">Check bot status</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h3>Live status</h3>
+        <p>See whether the bot is online and how fast it's responding right now.</p>
+        <a class="link" href="/status">Open status →</a>
+      </div>
+      <div class="card">
+        <h3>Dashboard</h3>
+        <p>Manage Antinuke, AutoMod, tickets, welcomer and more for your server.</p>
+        <a class="link" href="/dashboard">Open dashboard →</a>
+      </div>
+      <div class="card">
+        <h3>In-server help</h3>
+        <p>Run the bot's <code>/help</code> command to see every command and how to use it.</p>
+        <a class="link" href="/documentation">Read the docs →</a>
+      </div>
+    </section>
+
+    <h2>Getting started</h2>
+    <div class="steps">
+      <div class="step"><h3>Add the bot</h3><p>Invite SPIDEY and keep the permissions it asks for. It needs them to protect your server.</p></div>
+      <div class="step"><h3>Move its role up</h3><p>Drag SPIDEY's role near the top of your role list so it can act on rogue admins and bots.</p></div>
+      <div class="step"><h3>Open the dashboard</h3><p>Log in with Discord, pick your server, and switch on Antinuke and AutoMod.</p></div>
+    </div>
+
+    <h2>Quick fixes</h2>
+    <div class="fix">
+      <div class="row">
+        <h3>My server isn't showing in the dashboard</h3>
+        <p>You need Administrator or Manage Server in that server, and the bot must already be in it. Press <b>Refresh Server</b> in the dashboard sidebar, or log out and back in.</p>
+      </div>
+      <div class="row">
+        <h3>Antinuke or AutoMod isn't taking action</h3>
+        <p>Move SPIDEY's role near the top of your role list, above the roles it needs to manage, and make sure it has the permissions it needs (ban, kick, manage roles, manage channels, manage messages). Also check the module's master switch is on.</p>
+      </div>
+      <div class="row">
+        <h3>The bot doesn't respond to commands</h3>
+        <p>Check the <a href="/status" style="color:var(--red-soft);">status page</a>. If it's online, confirm the bot can view and send messages in that channel, and try the slash command version.</p>
+      </div>
+      <div class="row">
+        <h3>Welcomer or ticket messages aren't sending</h3>
+        <p>Make sure the channel you picked still exists and the bot has permission to view it and send messages and embeds there.</p>
+      </div>
+    </div>
+
+    <h2 id="faq">FAQ</h2>
+    <details class="faq"><summary>How do I add SPIDEY to my server? <span class="chev">⌄</span></summary><div class="ans">Use the invite link from the home page or support server, choose your server, and accept the permissions. Then open the dashboard to set things up.</div></details>
+    <details class="faq"><summary>Who can change settings in the dashboard? <span class="chev">⌄</span></summary><div class="ans">Server owners and members with Administrator or Manage Server permission. Extra owners can be added from the Antinuke page.</div></details>
+    <details class="faq"><summary>How do I get Premium? <span class="chev">⌄</span></summary><div class="ans">Premium is activated per server from that server's dashboard. If you have a payment or redeem-key problem, contact us in the support server and include your server ID.</div></details>
+    <details class="faq"><summary>I found a bug or want a feature <span class="chev">⌄</span></summary><div class="ans">Tell us in the support server with what you expected, what happened, and a screenshot if you can. It helps us fix things faster.</div></details>
+
+    <h2>Asking for help</h2>
+    <div class="two">
+      <div class="card">
+        <h3>Include this when you message us</h3>
+        <ul class="list">
+          <li>Your server ID and name</li>
+          <li>What you were trying to do</li>
+          <li>What happened instead, with a screenshot</li>
+          <li>Any error message you saw</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Premium support</h3>
+        <p>Payment, redeem key or activation problems? Contact us with your server ID and how you paid.</p>
+        <% if (premiumUrl) { %><a class="link" href="<%= premiumUrl %>" target="_blank" rel="noopener">Contact about Premium →</a><% } %>
+      </div>
+    </div>
+    <div class="notice"><b>Stay safe:</b> only use the invite and support links on this site. Staff will never ask for your password, bot token or login codes. If someone does, it's a scam.</div>
+
+    <% const mailTo = supportEmail || 'spideysupport@gmail.com'; %>
+    <section class="ticket" id="ticket">
+      <div class="ticket-card">
+        <div class="ticket-head">
+          <div>
+            <div class="kicker">Contact the team</div>
+            <h2>Raise a ticket</h2>
+          </div>
+          <span class="pill">Email request</span>
+        </div>
+
+        <form class="tf" id="ticketForm" novalidate>
+          <div>
+            <label for="tName">Your name</label>
+            <input id="tName" type="text" placeholder="Name" autocomplete="name" required>
+          </div>
+          <div>
+            <label for="tEmail">Email address</label>
+            <input id="tEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+          <div>
+            <label for="tTopic">What do you need help with?</label>
+            <select id="tTopic" required>
+              <option value="" disabled selected>Select a topic</option>
+              <option>Order or payment</option>
+              <option>Premium activation / redeem key</option>
+              <option>Refund request</option>
+              <option>Bot not working</option>
+              <option>Dashboard problem</option>
+              <option>Bug report</option>
+              <option>Feature request</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div>
+            <label for="tOrder">Order number <small>(optional)</small></label>
+            <input id="tOrder" type="text" placeholder="e.g. SS-1042">
+          </div>
+          <div class="full">
+            <label for="tSubject">Subject</label>
+            <input id="tSubject" type="text" placeholder="Briefly describe the issue" required>
+          </div>
+          <div class="full">
+            <label for="tMsg">Message</label>
+            <textarea id="tMsg" placeholder="Share the details that will help us understand your request." required></textarea>
+          </div>
+          <div class="full">
+            <p class="tf-note" style="margin-top:0;">We'll prepare an email to <a href="mailto:<%= mailTo %>"><%= mailTo %></a>. Your email app will open so you can review and send it. Don't include passwords or payment-card details.</p>
+            <button class="btn btn-primary tf-submit" type="submit">Continue to email &nbsp;↗</button>
+            <div class="tf-msg" id="tMsgBox" role="alert"></div>
+          </div>
+        </form>
+      </div>
+
+      <aside>
+        <div class="side-card">
+          <div class="side-icon">✦</div>
+          <h3>Before you send</h3>
+          <p>Include the order number (if you have one), your server ID and a clear description of the issue so the support team can understand your request.</p>
+          <hr>
+          <p>Keep passwords, verification codes, bot tokens and full payment details private.</p>
+        </div>
+        <a class="side-card side-link" href="#faq">
+          <div class="side-icon">?</div>
+          <div><h3>Check the FAQ</h3><p>See common questions about SPIDEY.</p></div>
+          <span class="arrow">↗</span>
+        </a>
+        <% if (supportUrl) { %>
+        <a class="side-card side-link" href="<%= supportUrl %>" target="_blank" rel="noopener">
+          <div class="side-icon">💬</div>
+          <div><h3>Talk to us on Discord</h3><p>Prefer chat? Join the support server.</p></div>
+          <span class="arrow">↗</span>
+        </a>
+        <% } %>
+      </aside>
+    </section>
+  </main>
+
+  <%- include('partials/site-footer') %>
+
+  <script>
+    function toggleDrawer(open) {
+      document.getElementById('drawer').classList.toggle('open', open);
+      document.getElementById('overlay').classList.toggle('open', open);
+    }
+    (function () {
+      var TO = <%- JSON.stringify(mailTo) %>;
+      var f = document.getElementById('ticketForm');
+      if (!f) return;
+      var box = document.getElementById('tMsgBox');
+      var v = function (id) { return document.getElementById(id).value.trim(); };
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = v('tName'), email = v('tEmail'), topic = v('tTopic'),
+            order = v('tOrder'), subject = v('tSubject'), msg = v('tMsg');
+        if (!name || !email || !topic || !subject || !msg) { box.className = 'tf-msg'; box.textContent = 'Please fill in every required field.'; return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { box.className = 'tf-msg'; box.textContent = 'Please enter a valid email address.'; return; }
+        box.textContent = '';
+        var body = 'Name: ' + name + '\nEmail: ' + email + '\nTopic: ' + topic +
+                   (order ? '\nOrder number: ' + order : '') + '\n\n' + msg;
+        var sub = '[' + topic + '] ' + subject + (order ? ' (' + order + ')' : '');
+        window.location.href = 'mailto:' + TO + '?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+        box.className = 'tf-msg ok';
+        box.textContent = 'Your email app should be opening. Review and press send. If nothing opens, email us at ' + TO + '.';
+        setTimeout(function () { f.reset(); }, 800);
+      });
+    })();
+  </script>
+</body>
+</html>

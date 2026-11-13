@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<title>Documentation — SPIDEY</title>
+<meta name="description" content="Setup guide, command reference and dashboard docs for SPIDEY.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #08060a; --ink2: #0f0c12; --panel: #130f16; --line: rgba(255,255,255,0.09);
+    --red: #ff3b4e; --red-soft: #ff8a96; --ice: #8fd8ff; --ok: #3ddc84;
+    --text: #f5f1f3; --muted: #a79fa6;
+    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; overflow-x: hidden; }
+  body { margin: 0; color: var(--text); font-family: var(--body); line-height: 1.6; min-height: 100vh;
+    background: radial-gradient(900px 520px at 8% -8%, rgba(255,59,78,0.20), transparent 60%), var(--ink); }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; border-radius: 6px; }
+
+  nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: rgba(8,6,10,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 19px; text-decoration: none; }
+  .brand-logo { width: 32px; height: 32px; border-radius: 9px; object-fit: cover; border: 1px solid var(--line); }
+  .nav-links { display: flex; align-items: center; gap: 24px; }
+  .nav-links a { text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); }
+  .nav-links a:hover, .nav-links a.on { color: var(--text); }
+  .btn { display: inline-flex; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; background: var(--red); color: #1a0306 !important; }
+  .btn:hover { background: #ff5566; }
+  .menu-btn { display: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); color: var(--text); font-size: 18px; cursor: pointer; }
+
+  .layout { display: flex; max-width: 1180px; margin: 0 auto; gap: 40px; padding: 0 24px; }
+  aside { width: 230px; flex-shrink: 0; position: sticky; top: 70px; align-self: flex-start; max-height: calc(100vh - 70px); overflow-y: auto; padding: 28px 0 40px; }
+  aside input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 14px; margin-bottom: 16px; }
+  aside input::placeholder { color: var(--muted); }
+  .toc-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 18px 0 6px; }
+  aside a { display: block; padding: 6px 10px; border-radius: 8px; font-size: 14px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; }
+  aside a:hover { color: var(--text); }
+  aside a.active { color: var(--text); background: rgba(255,59,78,0.1); border-left-color: var(--red); }
+
+  main { flex: 1; min-width: 0; padding: 40px 0 80px; max-width: 800px; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  h3 { font-size: 16px; margin: 26px 0 8px; }
+  .lead { color: var(--muted); font-size: 17px; margin: 0 0 8px; max-width: 60ch; }
+  section { padding: 44px 0 8px; border-top: 1px solid var(--line); margin-top: 44px; }
+  section.first { border-top: none; margin-top: 8px; padding-top: 12px; }
+  p, li { color: #d9d2d6; font-size: 15.5px; }
+  ol, ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  code { font-family: var(--mono); font-size: 13.5px; background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 6px; color: var(--red-soft); }
+
+  .steps { counter-reset: s; list-style: none; padding: 0; }
+  .steps li { counter-increment: s; position: relative; padding: 4px 0 14px 46px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 30px; height: 30px; border-radius: 9px; background: rgba(255,59,78,0.14); color: var(--red-soft); font-weight: 700; display: grid; place-items: center; border: 1px solid rgba(255,59,78,0.3); }
+  .callout { border: 1px solid rgba(143,216,255,0.28); background: rgba(143,216,255,0.06); border-radius: 12px; padding: 14px 16px; margin: 18px 0; font-size: 14.5px; }
+  .callout.warn { border-color: rgba(255,59,78,0.35); background: rgba(255,59,78,0.07); }
+  .callout b { color: var(--text); }
+
+  .cmds { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel); margin: 14px 0; }
+  .cmd { display: grid; grid-template-columns: minmax(150px, 38%) 1fr; gap: 16px; padding: 12px 16px; border-top: 1px solid var(--line); align-items: start; }
+  .cmd:first-child { border-top: none; }
+  .cmd code { background: none; padding: 0; color: var(--text); font-size: 13.5px; word-break: break-word; }
+  .cmd span { color: var(--muted); font-size: 14.5px; }
+  .cmd[hidden], section[hidden] { display: none; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; background: rgba(255,59,78,0.14); color: var(--red-soft); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0; }
+  .card { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 16px; }
+  .card b { display: block; margin-bottom: 4px; }
+  .card p { margin: 0; font-size: 14px; color: var(--muted); }
+
+  details.faq { border-top: 1px solid var(--line); padding: 14px 0; }
+  details.faq summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::after { content: '+'; color: var(--red-soft); font-size: 20px; line-height: 1; }
+  details.faq[open] summary::after { content: '–'; }
+  details.faq p { margin: 10px 0 0; }
+  .noresult { display: none; color: var(--muted); padding: 30px 0; }
+
+  footer { border-top: 1px solid var(--line); padding: 26px 24px; color: var(--muted); font-size: 13.5px; }
+  footer .in { max-width: 1180px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+  footer a { text-decoration: none; margin-right: 14px; } footer a:hover { color: var(--text); }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 25; }
+  @media (max-width: 900px) {
+    .nav-links { display: none; } .menu-btn { display: block; }
+    .layout { display: block; padding: 0 18px; }
+    aside { position: fixed; top: 0; left: 0; height: 100%; max-height: none; width: min(290px, 86vw); background: var(--ink2); border-right: 1px solid var(--line);
+      padding: 20px 16px; z-index: 30; transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility 0s linear .25s; }
+    aside.open { transform: none; visibility: visible; transition: transform .25s ease, visibility 0s; }
+    .overlay.open { display: block; }
+    .cmd { grid-template-columns: 1fr; gap: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } aside { transition: none; } }
+</style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt=""> SPIDEY</a>
+    <div class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/status">Status</a>
+      <a href="/documentation" class="on">Docs</a>
+      <a href="/support">Support</a>
+      <% if (user) { %><a href="/dashboard" class="btn">Open dashboard</a><% } else { %><a href="/login" class="btn">Log in with Discord</a><% } %>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;"><%- include('partials/home-btn') %><button class="menu-btn" aria-label="Open docs menu" onclick="toggleMenu(true)">☰</button></div>
+  </nav>
+  <div class="overlay" id="overlay" onclick="toggleMenu(false)"></div>
+
+  <div class="layout">
+    <aside id="toc">
+      <input id="q" type="search" placeholder="Search docs…" aria-label="Search docs" autocomplete="off">
+      <div class="toc-label">Getting started</div>
+      <a href="#intro">Introduction</a>
+      <a href="#setup">Quick setup</a>
+      <a href="#dashboard">Dashboard</a>
+      <div class="toc-label">Modules</div>
+      <a href="#antinuke">Anti-nuke</a>
+      <a href="#automod">AutoMod</a>
+      <a href="#tickets">Tickets</a>
+      <a href="#reactionroles">Reaction roles</a>
+      <a href="#welcomer">Welcomer, autorole &amp; logs</a>
+      <a href="#music">Music</a>
+      <div class="toc-label">Reference</div>
+      <a href="#access">Whitelist &amp; owners</a>
+      <a href="#premium">Premium</a>
+      <a href="#commands">All commands</a>
+      <a href="#faq">FAQ</a>
+    </aside>
+
+    <main id="content">
+      <section class="first" id="intro">
+        <h1>SPIDEY documentation</h1>
+        <p class="lead">Everything you need to protect and run your server: setup, every module, and every command.</p>
+        <div class="grid">
+          <div class="card"><b>Slash commands</b><p>Type <code>/</code> in any channel to see what SPIDEY can do. Run <code>/help</code> for the full list.</p></div>
+          <div class="card"><b>Web dashboard</b><p>Log in with Discord and configure every module without typing commands.</p></div>
+          <div class="card"><b>Prefix commands</b><p>Every command also works with your server prefix, like <code>!play</code> or <code>!antinuke enableall</code>. Put multi-word text in "quotes". Change the prefix with <code>/prefix set</code>.</p></div>
+        </div>
+      </section>
+
+      <section id="setup">
+        <h2>Quick setup</h2>
+        <ol class="steps">
+          <li><b>Invite SPIDEY.</b> Use the invite button on the <a href="/support" style="color:var(--red-soft)">Support page</a>. Give it the permissions it asks for, because anti-nuke cannot undo what it has no permission to fix.</li>
+          <li><b>Move its role up.</b> In Server Settings → Roles, drag SPIDEY's role above the roles it should moderate.</li>
+          <li><b>Log in to the dashboard.</b> Sign in with Discord, then pick your server. You need Administrator or Manage Server on that server.</li>
+          <li><b>Set a log channel.</b> Run <code>/setlogchannel</code> or choose one in the Logging module.</li>
+          <li><b>Turn on protection.</b> Run <code>/antinuke enableall</code> and <code>/automod status</code> to see what is active.</li>
+        </ol>
+        <div class="callout warn"><b>Role position matters.</b> If SPIDEY's role is below another role, it cannot ban, kick or restore that role's members.</div>
+      </section>
+
+      <section id="dashboard">
+        <h2>Dashboard</h2>
+        <p>The dashboard lists every server where you have Administrator or Manage Server. Pick one to open its modules.</p>
+        <div class="grid">
+          <div class="card"><b>Overview</b><p>Status of every module at a glance.</p></div>
+          <div class="card"><b>AutoMod</b><p>Filters, banned words and domains.</p></div>
+          <div class="card"><b>Antinuke</b><p>Limits and punishments per event.</p></div>
+          <div class="card"><b>Welcomer</b><p>Greet new members.</p></div>
+          <div class="card"><b>Reaction Roles</b><p>Role panels with emoji.</p></div>
+          <div class="card"><b>Tickets</b><p>Support panel and settings.</p></div>
+          <div class="card"><b>Autorole</b><p>Role given on join.</p></div>
+          <div class="card"><b>Logging</b><p>Where security logs go.</p></div>
+          <div class="card"><b>Bot Profile</b><p>Custom name, avatar and banner (Premium).</p></div>
+        </div>
+      </section>
+
+      <section id="antinuke">
+        <h2>Anti-nuke</h2>
+        <p>SPIDEY watches your audit log. When one account does too much damage too fast (mass bans, channel deletes, role changes, unknown bots), it applies the punishment you chose and restores what it can.</p>
+        <h3>How limits work</h3>
+        <p>Each event has an on/off switch, a <b>limit</b> (how many times, 1–20) and an <b>action</b> (ban or kick). Go over the limit and the action fires.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="antinuke status"><code>/antinuke status</code><span>Show protection status for this server.</span></div>
+          <div class="cmd" data-s="antinuke config event limit action"><code>/antinuke config</code><span>Set enabled, limit and action for one event.</span></div>
+          <div class="cmd" data-s="antinuke enableall"><code>/antinuke enableall</code><span>Turn on every protection.</span></div>
+          <div class="cmd" data-s="antinuke disableall"><code>/antinuke disableall</code><span>Turn off every protection.</span></div>
+        </div>
+        <div class="callout"><b>Tip:</b> add trusted staff and bots to the whitelist so they are never punished. See <a href="#access" style="color:var(--red-soft)">Whitelist &amp; owners</a>.</div>
+      </section>
+
+      <section id="automod">
+        <h2>AutoMod</h2>
+        <p>Filters messages in real time. Features: Spam, Word filter, Caps, Link filter, Invite filter and Raid protection.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="automod status"><code>/automod status</code><span>Show which filters are on.</span></div>
+          <div class="cmd" data-s="automod toggle feature"><code>/automod toggle</code><span>Enable or disable one filter.</span></div>
+          <div class="cmd" data-s="automod action punishment"><code>/automod action</code><span>Choose what happens to offenders.</span></div>
+          <div class="cmd" data-s="automod word add remove banned"><code>/automod word add|remove</code><span>Manage banned words.</span></div>
+          <div class="cmd" data-s="automod domain add remove link"><code>/automod domain add|remove</code><span>Manage allowed or blocked domains.</span></div>
+        </div>
+        <p>Bulk editing of words and domains is easier on the AutoMod page of the dashboard.</p>
+      </section>
+
+      <section id="tickets">
+        <h2>Tickets</h2>
+        <p>Design your panel in the Tickets module, then post it with one command. Members press the button, get a private channel, and staff close it when done.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="ticket panel"><code>/ticket panel</code><span>Post the ticket panel using your dashboard settings.</span></div>
+          <div class="cmd" data-s="ticket close"><code>/ticket close</code><span>Close the current ticket.</span></div>
+          <div class="cmd" data-s="ticket add user"><code>/ticket add</code><span>Add someone to this ticket.</span></div>
+          <div class="cmd" data-s="ticket remove user"><code>/ticket remove</code><span>Remove someone from this ticket.</span></div>
+        </div>
+      </section>
+
+      <section id="reactionroles">
+        <h2>Reaction roles</h2>
+        <p>Post a panel, then link emoji to roles. When a member reacts, they get the role.</p>
+        <ol class="steps">
+          <li>Run <code>/reactionrole panel</code> with a channel, title and description.</li>
+          <li>Copy the panel's message ID (Developer Mode → right-click → Copy Message ID).</li>
+          <li>Run <code>/reactionrole add</code> with the channel, message ID, emoji and role.</li>
+        </ol>
+        <div class="cmds">
+          <div class="cmd" data-s="reactionrole panel"><code>/reactionrole panel</code><span>Post a new reaction-role embed.</span></div>
+          <div class="cmd" data-s="reactionrole add emoji role"><code>/reactionrole add</code><span>Link an emoji on a panel to a role.</span></div>
+          <div class="cmd" data-s="reactionrole remove"><code>/reactionrole remove</code><span>Unlink an emoji from a panel.</span></div>
+          <div class="cmd" data-s="reactionrole list"><code>/reactionrole list</code><span>List emoji-role links on a panel.</span></div>
+        </div>
+      </section>
+
+      <section id="welcomer">
+        <h2>Welcomer, autorole &amp; logs</h2>
+        <p><b>Welcomer</b> greets new members. Set the channel and message in the dashboard.</p>
+        <p><b>Autorole</b> gives every new member a role the moment they join.</p>
+        <p><b>Logging</b> sends security events to one channel so your staff can see what SPIDEY did.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="setautorole role join"><code>/setautorole</code><span>Set the role given to every new member.</span></div>
+          <div class="cmd" data-s="setlogchannel log channel"><code>/setlogchannel</code><span>Set the security log channel.</span></div>
+        </div>
+      </section>
+
+      <section id="music">
+        <h2>Music</h2>
+        <p>Play from YouTube, Spotify and SoundCloud links, or just type a song name. All music commands work as slash commands and with your prefix.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="music play song"><code>/play &lt;query&gt;</code><span>Play a song or playlist by name or link.</span></div>
+          <div class="cmd" data-s="music search"><code>/search &lt;query&gt;</code><span>Search and pick the right result.</span></div>
+          <div class="cmd" data-s="music pause"><code>/pause</code> · <code>/resume</code><span>Pause or resume playback.</span></div>
+          <div class="cmd" data-s="music skip"><code>/skip</code><span>Skip the current song.</span></div>
+          <div class="cmd" data-s="music stop leave"><code>/stop</code><span>Stop, clear the queue and leave.</span></div>
+          <div class="cmd" data-s="music queue"><code>/queue [page]</code><span>Show the queue.</span></div>
+          <div class="cmd" data-s="music nowplaying"><code>/nowplaying</code><span>Current song with progress bar.</span></div>
+          <div class="cmd" data-s="music volume"><code>/volume &lt;1-100&gt;</code><span>Set the volume.</span></div>
+          <div class="cmd" data-s="music loop"><code>/loop &lt;mode&gt;</code><span>Off, current track, whole queue or autoplay.</span></div>
+          <div class="cmd" data-s="music autoplay related"><code>/autoplay [on|off]</code><span>Keep playing related songs when the queue ends. Admins change it.</span></div>
+          <div class="cmd" data-s="music shuffle"><code>/shuffle</code><span>Shuffle the queue.</span></div>
+          <div class="cmd" data-s="music remove position"><code>/remove &lt;position&gt;</code><span>Remove a song from the queue.</span></div>
+          <div class="cmd" data-s="music 247 24/7 stay voice"><code>/247 &lt;on|off&gt;</code><span>Keep the bot in a voice channel 24/7. Admins only.</span></div>
+        </div>
+      </section>
+
+      <section id="access">
+        <h2>Whitelist &amp; owners</h2>
+        <p><b>Whitelist</b> exempts a user from all anti-nuke punishment. <b>Extra owners</b> get full administrative access to SPIDEY's settings on your server. Only give owner access to people you trust completely.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="whitelist add"><code>/whitelist add</code><span>Exempt a user from anti-nuke protection.</span></div>
+          <div class="cmd" data-s="whitelist remove"><code>/whitelist remove</code><span>Remove a user from the whitelist.</span></div>
+          <div class="cmd" data-s="whitelist list"><code>/whitelist list</code><span>List whitelisted users.</span></div>
+          <div class="cmd" data-s="whitelist view"><code>/whitelist view</code><span>Show one user's bypass permissions.</span></div>
+          <div class="cmd" data-s="whitelist reset"><code>/whitelist reset</code><span>Remove every user from the whitelist.</span></div>
+          <div class="cmd" data-s="owner add extra"><code>/owner add</code><span>Grant full administrative access to a user.</span></div>
+          <div class="cmd" data-s="owner remove extra"><code>/owner remove</code><span>Revoke extra-owner access.</span></div>
+          <div class="cmd" data-s="owner list extra"><code>/owner list</code><span>List extra owners.</span></div>
+        </div>
+      </section>
+
+      <section id="premium">
+        <h2>Premium</h2>
+        <p>Premium unlocks the <b>Bot Profile</b> module: give SPIDEY your own name, avatar, banner and bio in your server. It costs <b>₹<%= priceInr %></b> (India, UPI/cards) or <b>$<%= priceUsd %></b> (international) for <b><%= premiumDays %> days</b> per server.</p>
+        <ol class="steps">
+          <li>Open your server in the dashboard and go to <b>Bot Profile</b>.</li>
+          <li>Press upgrade and pay on Cashfree's secure checkout.</li>
+          <li>Premium is applied to that server automatically after payment.</li>
+        </ol>
+        <p>Have a premium key instead? Redeem it in the dashboard or with the command below.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="premium status"><code>/premium status</code><span>Check this server's premium status.</span></div>
+          <div class="cmd" data-s="premium redeem key"><code>/premium redeem</code><span>Redeem a premium key for this server.</span></div>
+        </div>
+        <p>See the <a href="/refund" style="color:var(--red-soft)">Refund Policy</a> for billing questions.</p>
+      </section>
+
+      <section id="commands">
+        <h2>All commands</h2>
+        <p>Quick list. Use <code>/help</code> in Discord for the always up-to-date version.</p>
+        <div class="cmds">
+          <div class="cmd" data-s="help"><code>/help</code><span>Show all commands and how to use the bot.</span></div>
+          <div class="cmd" data-s="prefix view"><code>/prefix view</code><span>Show the current prefix.</span></div>
+          <div class="cmd" data-s="prefix set change"><code>/prefix set</code><span>Change the prefix, 1–5 characters. Admins only.</span></div>
+          <div class="cmd" data-s="antinuke automod whitelist owner ticket reactionrole music premium"><code>/antinuke · /automod · /whitelist · /owner · /ticket · /reactionrole · /premium</code><span>Documented in their sections above.</span></div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <details class="faq"><summary>The dashboard does not show my server.</summary><p>You need Administrator or Manage Server on that server, and SPIDEY must already be in it. Log out and back in to refresh your server list.</p></details>
+        <details class="faq"><summary>SPIDEY did not punish someone.</summary><p>Check that the person is not whitelisted, that the event is enabled, and that SPIDEY's role sits above theirs.</p></details>
+        <details class="faq"><summary>Music will not play.</summary><p>Join a voice channel first and make sure SPIDEY can connect and speak there. If it still fails, try a different link or use <code>/search</code>.</p></details>
+        <details class="faq"><summary>I paid but premium is not active.</summary><p>Give it a minute and run <code>/premium status</code>. If it is still missing, contact us from the <a href="/support" style="color:var(--red-soft)">Support page</a> with your payment ID.</p></details>
+        <details class="faq"><summary>Can I change the prefix?</summary><p>Yes. Run <code>/prefix set</code> with 1–5 characters.</p></details>
+        <p style="margin-top:20px">Still stuck? <a href="/support" style="color:var(--red-soft)">Visit the Support page →</a></p>
+      </section>
+
+      <p class="noresult" id="noresult">No results. Try a different word.</p>
+    </main>
+  </div>
+
+  <footer>
+    <div class="in">
+      <div>SPIDEY — built for server security.</div>
+      <div><a href="/">Home</a><a href="/status">Status</a><a href="/support">Support</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/refund">Refunds</a><a href="/contact">Contact</a></div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu(open) {
+      document.getElementById('toc').classList.toggle('open', open);
+      document.getElementById('overlay').classList.toggle('open', open);
+    }
+    document.querySelectorAll('aside a').forEach(function (a) { a.addEventListener('click', function () { toggleMenu(false); }); });
+
+    // Highlight the current section in the sidebar
+    var links = {}; document.querySelectorAll('aside a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && links[e.target.id]) {
+            Object.values(links).forEach(function (l) { l.classList.remove('active'); });
+            links[e.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-80px 0px -65% 0px' });
+      document.querySelectorAll('main section').forEach(function (s) { io.observe(s); });
+    }
+
+    // Search: filters commands and sections by text
+    var q = document.getElementById('q'), none = document.getElementById('noresult');
+    q.addEventListener('input', function () {
+      var t = q.value.trim().toLowerCase(), shown = 0;
+      document.querySelectorAll('main section').forEach(function (sec) {
+        var cmds = sec.querySelectorAll('.cmd'), hit = !t || sec.textContent.toLowerCase().indexOf(t) > -1;
+        var any = false;
+        cmds.forEach(function (c) {
+          var m = !t || (c.textContent + ' ' + (c.dataset.s || '')).toLowerCase().indexOf(t) > -1;
+          c.hidden = !m; if (m) any = true;
+        });
+        if (!any) cmds.forEach(function (c) { c.hidden = false; });
+        sec.hidden = !hit; if (hit) shown++;
+      });
+      none.style.display = shown ? 'none' : 'block';
+    });
+  </script>
+</body>
+</html>

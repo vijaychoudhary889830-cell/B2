@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giveaways — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+<style>
+  /* ===== Giveaway module (SPIDEY red/dark theme) ===== */
+  .gw-hero { padding: 22px; margin-bottom: 16px; background: linear-gradient(135deg, #3a0810 0%, #1c0a12 55%, #130f16 100%); border: 1px solid rgba(255,59,78,.32); border-radius: 14px; }
+  .gw-hero h1 { font-family: var(--display); font-size: 24px; margin: 0 0 8px; }
+  .gw-hero p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; max-width: 420px; }
+  .gw-hero .rule { height: 1px; background: rgba(255,255,255,.1); margin: 18px 0 14px; }
+  .gw-hero .lbl { font-size: 11px; font-weight: 800; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+  .gw-hero .big { font-family: var(--display); font-size: 40px; line-height: 1.05; font-weight: 800; text-transform: uppercase; color: var(--red2); }
+  .gw-hero .big.off { color: var(--warn); }
+
+  .gw-stats { display: grid; gap: 10px; margin-bottom: 16px; }
+  .gw-stat { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+  .gw-stat .ic { width: 42px; height: 42px; border-radius: 11px; background: var(--card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--red2); }
+  .gw-stat .k { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .gw-stat .v { font-family: var(--display); font-size: 18px; font-weight: 800; text-transform: uppercase; margin-top: 1px; }
+
+  .gw-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; margin-bottom: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+  .gw-tab { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 6px; border-radius: 10px; border: none; background: none; color: var(--muted); font-family: inherit; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+  .gw-tab:hover { color: var(--text); }
+  .gw-tab.on { background: rgba(255,59,78,.16); color: var(--red2); box-shadow: inset 0 0 0 1px rgba(255,59,78,.4); }
+  .gw-tab .n { font-size: 10px; background: rgba(255,255,255,.08); border-radius: 999px; padding: 1px 7px; }
+  .gw-pane { display: none; } .gw-pane.on { display: block; }
+
+  .gw-flash { margin-bottom: 14px; padding: 11px 14px; border-radius: 11px; font-size: 13px; font-weight: 700; }
+  .gw-flash.good { color: var(--good); background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); }
+  .gw-flash.bad { color: var(--red2); background: rgba(255,59,78,.1); border: 1px solid rgba(255,59,78,.35); }
+
+  .gw-sub { color: var(--muted); font-size: 12.5px; margin: -4px 0 14px; }
+  .gw-field { margin-bottom: 14px; }
+  .gw-field label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; }
+  .gw-field input[type=text], .gw-field input[type=url], .gw-field select { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-family: inherit; font-size: 13px; font-weight: 700; letter-spacing: .03em; outline: none; }
+  .gw-field select { color: var(--red2); border-color: rgba(255,59,78,.35); background-color: rgba(255,59,78,.05); text-transform: uppercase; font-size: 12px; letter-spacing: .06em; }
+  .gw-field input:focus, .gw-field select:focus { border-color: rgba(255,59,78,.7); }
+  .gw-field .hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .gw-row { display: grid; gap: 12px; } @media (min-width: 640px) { .gw-row.two { grid-template-columns: 1fr 1fr; } .gw-stats { grid-template-columns: repeat(3, 1fr); } }
+  .gw-go { display: flex; justify-content: flex-end; margin-top: 6px; }
+  .gw-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border-radius: 10px; border: 1px solid rgba(255,59,78,.55); background: linear-gradient(135deg, #ff3b4e, #c4162a); color: #1a0306; font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+  .gw-btn:hover { filter: brightness(1.08); }
+  .gw-btn.ghost { background: var(--card2); color: var(--text); border-color: var(--border); }
+
+  .gw-item { background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 12px; }
+  .gw-item-top { display: flex; gap: 12px; align-items: flex-start; }
+  .gw-item .tro { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,59,78,.12); border: 1px solid rgba(255,59,78,.3); color: var(--red2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .gw-item .nm { font-size: 15px; font-weight: 800; word-break: break-word; }
+  .gw-item .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; font-size: 11.5px; color: var(--muted); }
+  .gw-item .meta b { color: var(--text); }
+  .gw-item .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .gw-item .acts form { display: inline; }
+  .gw-abtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: inherit; text-decoration: none; }
+  .gw-abtn:hover { border-color: rgba(255,255,255,.3); }
+  .gw-abtn.danger { color: var(--red2); border-color: rgba(255,59,78,.35); background: rgba(255,59,78,.06); }
+  .gw-abtn.danger:hover { background: rgba(255,59,78,.14); }
+  .gw-pill { display: inline-flex; align-items: center; font-size: 9.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+  .gw-pill.live { color: var(--good); background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3); }
+  .gw-pill.done { color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid var(--border); }
+  .gw-pill.cx { color: var(--red2); background: rgba(255,59,78,.1); border: 1px solid rgba(255,59,78,.3); }
+  .gw-sec { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--red2); text-transform: uppercase; margin: 22px 0 2px; }
+  .gw-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 26px 12px; border: 1px dashed var(--border); border-radius: 12px; background: rgba(255,255,255,.02); }
+
+  .gw-role { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; margin-top: 8px; background: var(--card2); border: 1px solid var(--border); border-radius: 11px; font-size: 13px; font-weight: 700; }
+  .gw-add { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+  .gw-brand-prev { margin-top: 4px; border-radius: 12px; border-left: 4px solid var(--prev, #E11D2E); background: #17121b; padding: 12px 14px; font-size: 13px; }
+  .gw-brand-prev .t { font-weight: 800; margin-bottom: 4px; }
+  .gw-brand-prev .d { color: var(--muted); font-size: 12px; line-height: 1.5; }
+  .gw-brand-prev .b { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 6px; background: #c4162a; color: #fff; font-size: 12px; font-weight: 700; }
+  .gw-color { display: flex; gap: 10px; align-items: center; }
+  .gw-color input[type=color] { width: 46px; height: 42px; border: 1px solid var(--border); border-radius: 10px; background: var(--card2); padding: 3px; cursor: pointer; }
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'giveaways' }) %>
+<%- include('partials/topbar', { pageLabel: 'Giveaways' }) %>
+
+<%
+  const fmtAgo = (ms) => {
+    let s = Math.max(0, Math.round((ms - Date.now()) / 1000));
+    if (s < 60) return s + 's';
+    const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+    return (d ? d + 'd ' : '') + (h ? h + 'h ' : '') + (!d && m ? m + 'm' : '');
+  };
+  const fmtDate = (ms) => new Date(ms).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+  const tabs = [['create', 'plus', 'Create'], ['list', 'list-checks', 'Giveaways'], ['settings', 'sliders', 'Settings']];
+%>
+
+      <!-- ===== HERO ===== -->
+      <div class="gw-hero">
+        <h1>Giveaway Management</h1>
+        <p>Host high-engagement community giveaways with automated winner selection, roll-out controls, and custom visual branding.</p>
+        <div class="rule"></div>
+        <div class="lbl">Engine status</div>
+        <div class="big <%= botInGuild ? '' : 'off' %>"><%= botInGuild ? 'Ready' : 'Bot offline' %></div>
+      </div>
+
+      <!-- ===== STATS ===== -->
+      <div class="gw-stats">
+        <div class="gw-stat"><div class="ic"><%- icon('gift', 20) %></div>
+          <div><div class="k">Active giveaways</div><div class="v"><%= gwActive.length %> Giveaway<%= gwActive.length === 1 ? '' : 's' %></div></div></div>
+        <div class="gw-stat"><div class="ic"><%- icon('users', 20) %></div>
+          <div><div class="k">Staff permissions</div><div class="v"><%= gwManagerRoles.length ? gwManagerRoles.length + ' Role' + (gwManagerRoles.length === 1 ? '' : 's') : 'Not configured' %></div></div></div>
+        <div class="gw-stat"><div class="ic"><%- icon('image', 20) %></div>
+          <div><div class="k">Visual branding</div><div class="v"><%= gwCustomBrand ? 'Custom theme' : 'Default theme' %></div></div></div>
+      </div>
+
+      <!-- ===== TABS ===== -->
+      <div class="gw-tabs" id="panel">
+        <% tabs.forEach(t => { %>
+          <button type="button" class="gw-tab <%= gwTab === t[0] ? 'on' : '' %>" data-tab="<%= t[0] %>" title="<%= t[2] %>">
+            <%- icon(t[1], 16) %><span><%= t[2] %></span><% if (t[0] === 'list' && gwActive.length) { %><span class="n"><%= gwActive.length %></span><% } %>
+          </button>
+        <% }) %>
+      </div>
+
+      <% if (saved) { %><div class="gw-flash good"><%= gwMsg %></div><% } %>
+      <% if (error) { %><div class="gw-flash bad"><%= error %></div><% } %>
+
+      <!-- ===== CREATE ===== -->
+      <div class="gw-pane glass panel <%= gwTab === 'create' ? 'on' : '' %>" id="pane-create">
+        <div class="panel-head"><h2>Giveaway Module</h2></div>
+        <p class="gw-sub">Configure parameters for a new community giveaway instance.</p>
+        <form action="/dashboard/<%= guildId %>/giveaways/start" method="POST">
+          <div class="gw-field">
+            <label><%- icon('hash', 14) %>Giveaway channel</label>
+            <select name="channelId" required>
+              <option value="">Select target channel…</option>
+              <% guildTextChannels.forEach(c => { %><option value="<%= c.id %>">#<%= c.name %></option><% }) %>
+            </select>
+          </div>
+          <div class="gw-row two">
+            <div class="gw-field">
+              <label><%- icon('clock', 14) %>Duration (e.g. 1h, 10d)</label>
+              <input type="text" name="duration" placeholder="Enter duration…" autocomplete="off" required>
+              <div class="hint">Use s, m, h, d or w. Combine them: 1d12h. Minimum 10s, maximum 30d.</div>
+            </div>
+            <div class="gw-field">
+              <label><%- icon('trophy', 14) %>Winner count</label>
+              <select name="winners">
+                <% for (let n = 1; n <= gwMaxWinners; n++) { %><option value="<%= n %>"><%= n %> winner<%= n > 1 ? 's' : '' %></option><% } %>
+              </select>
+            </div>
+          </div>
+          <div class="gw-field">
+            <label><%- icon('gift', 14) %>Prize description</label>
+            <input type="text" name="prize" placeholder="Enter prize name…" maxlength="200" autocomplete="off" required>
+          </div>
+          <div class="gw-field">
+            <label><%- icon('lock', 14) %>Required role (optional)</label>
+            <select name="requiredRoleId">
+              <option value="">Anyone can enter</option>
+              <% guildRoles.forEach(r => { %><option value="<%= r.id %>">@<%= r.name %></option><% }) %>
+            </select>
+          </div>
+          <div class="gw-go"><button type="submit" class="gw-btn"><%- icon('plus', 15) %>Start giveaway</button></div>
+        </form>
+      </div>
+
+      <!-- ===== LIST ===== -->
+      <div class="gw-pane glass panel <%= gwTab === 'list' ? 'on' : '' %>" id="pane-list">
+        <div class="panel-head"><h2><%- icon('list-checks', 16, 'margin-right:7px;') %>Active Giveaways</h2></div>
+        <p class="gw-sub">Real-time monitoring of all running giveaway instances.</p>
+
+        <% if (!gwActive.length) { %>
+          <div class="gw-empty">No active giveaways</div>
+        <% } %>
+        <% gwActive.forEach(g => { %>
+          <div class="gw-item">
+            <div class="gw-item-top">
+              <div class="tro"><%- icon('trophy', 18) %></div>
+              <div style="min-width:0;flex:1">
+                <div class="nm"><%= g.prize %><span class="gw-pill live">Live</span></div>
+                <div class="meta">
+                  <span>#<b><%= g.channelName %></b></span>
+                  <span>Entries <b><%= g.entries %></b></span>
+                  <span>Winners <b><%= g.winners %></b></span>
+                  <span>Ends in <b><%= fmtAgo(g.endsAt) %></b></span>
+                  <% if (g.requiredRole) { %><span>Role <b>@<%= g.requiredRole %></b></span><% } %>
+                </div>
+              </div>
+            </div>
+            <div class="acts">
+              <form action="/dashboard/<%= guildId %>/giveaways/<%= g.id %>/end" method="POST" onsubmit="return confirm('End this giveaway now and pick winners?')"><button class="gw-abtn" type="submit"><%- icon('check', 14) %>End now</button></form>
+              <form action="/dashboard/<%= guildId %>/giveaways/<%= g.id %>/cancel" method="POST" onsubmit="return confirm('Cancel this giveaway? No winners will be picked.')"><button class="gw-abtn danger" type="submit"><%- icon('x', 14) %>Cancel</button></form>
+              <a class="gw-abtn" href="<%= g.url %>" target="_blank" rel="noopener"><%- icon('link', 14) %>Open</a>
+            </div>
+          </div>
+        <% }) %>
+
+        <% if (gwEnded.length) { %>
+          <div class="gw-sec">Recently ended</div>
+          <% gwEnded.forEach(g => { %>
+            <div class="gw-item">
+              <div class="gw-item-top">
+                <div class="tro"><%- icon(g.cancelled ? 'ban' : 'trophy', 18) %></div>
+                <div style="min-width:0;flex:1">
+                  <div class="nm"><%= g.prize %><span class="gw-pill <%= g.cancelled ? 'cx' : 'done' %>"><%= g.cancelled ? 'Cancelled' : 'Ended' %></span></div>
+                  <div class="meta">
+                    <span>#<b><%= g.channelName %></b></span>
+                    <span>Entries <b><%= g.entries %></b></span>
+                    <span><b><%= fmtDate(g.endedAt || g.endsAt) %></b></span>
+                    <% if (!g.cancelled) { %><span>Winners <b><%= g.winnerIds.length ? g.winnerIds.map(id => '@' + id).join(', ') : 'none' %></b></span><% } %>
+                  </div>
+                </div>
+              </div>
+              <div class="acts">
+                <% if (!g.cancelled) { %>
+                  <form action="/dashboard/<%= guildId %>/giveaways/<%= g.id %>/reroll" method="POST" onsubmit="return confirm('Pick new winner(s)?')"><button class="gw-abtn" type="submit"><%- icon('refresh', 14) %>Reroll</button></form>
+                <% } %>
+                <a class="gw-abtn" href="<%= g.url %>" target="_blank" rel="noopener"><%- icon('link', 14) %>Open</a>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div class="gw-pane <%= gwTab === 'settings' ? 'on' : '' %>" id="pane-settings">
+        <div class="glass panel">
+          <div class="panel-head"><h2>Giveaway Manager</h2></div>
+          <p class="gw-sub">Grant Giveaway Manager to specific roles. They can run <code>/giveaway</code> without being an admin. Admins and owners always can.</p>
+          <form action="/dashboard/<%= guildId %>/giveaways/managers" method="POST" class="gw-add">
+            <input type="hidden" name="actionType" value="add">
+            <div class="gw-field" style="margin:0">
+              <label><%- icon('user-plus', 14) %>Elevate role</label>
+              <select name="roleId" required>
+                <option value="">Select Giveaway Manager role…</option>
+                <% guildRoles.filter(r => !gwManagerRoles.some(m => m.id === r.id)).forEach(r => { %><option value="<%= r.id %>">@<%= r.name %></option><% }) %>
+              </select>
+            </div>
+            <button type="submit" class="gw-btn"><%- icon('plus', 15) %>Add</button>
+          </form>
+          <% if (!gwManagerRoles.length) { %>
+            <div class="gw-empty" style="margin-top:14px">No role configured</div>
+          <% } %>
+          <% gwManagerRoles.forEach(r => { %>
+            <div class="gw-role"><span>@<%= r.name %></span>
+              <form action="/dashboard/<%= guildId %>/giveaways/managers" method="POST" style="display:inline">
+                <input type="hidden" name="actionType" value="remove"><input type="hidden" name="roleId" value="<%= r.id %>">
+                <button type="submit" class="gw-abtn danger"><%- icon('trash', 13) %>Remove</button>
+              </form></div>
+          <% }) %>
+        </div>
+
+        <div class="glass panel">
+          <div class="panel-head"><h2>Visual Branding</h2></div>
+          <p class="gw-sub">Customize the appearance of giveaway embeds.</p>
+          <form action="/dashboard/<%= guildId %>/giveaways/branding" method="POST" id="brandForm">
+            <div class="gw-row two">
+              <div class="gw-field"><label>Embed color</label>
+                <div class="gw-color"><input type="color" id="colorPick" value="<%= gwBrand.color %>"><input type="text" name="color" id="colorTxt" value="<%= gwBrand.color %>" maxlength="7" autocomplete="off"></div></div>
+              <div class="gw-field"><label>Footer text</label><input type="text" name="footer" value="<%= gwBrand.footer %>" maxlength="100" placeholder="Optional footer…" autocomplete="off"></div>
+            </div>
+            <div class="gw-row two">
+              <div class="gw-field"><label>Button label</label><input type="text" name="buttonLabel" id="btnLabel" value="<%= gwBrand.buttonLabel %>" maxlength="40" autocomplete="off"></div>
+              <div class="gw-field"><label>Button emoji</label><input type="text" name="buttonEmoji" id="btnEmoji" value="<%= gwBrand.buttonEmoji %>" maxlength="40" autocomplete="off"><div class="hint">A normal emoji, like 🎉. Leave empty for none.</div></div>
+            </div>
+            <div class="gw-field"><label><%- icon('image', 14) %>Thumbnail URL</label><input type="url" name="thumbnail" value="<%= gwBrand.thumbnail %>" placeholder="https://…" autocomplete="off"></div>
+            <div class="gw-field"><label><%- icon('image', 14) %>Banner image URL</label><input type="url" name="image" value="<%= gwBrand.image %>" placeholder="https://…" autocomplete="off"></div>
+
+            <div class="gw-field"><label>Preview</label>
+              <div class="gw-brand-prev" id="prev" style="--prev:<%= gwBrand.color %>">
+                <div class="t">🎉 Example prize</div>
+                <div class="d">Click the button below to enter!<br>Winners: <b>1</b> · Entries: <b>0</b></div>
+                <span class="b" id="prevBtn"><%= gwBrand.buttonEmoji %> <%= gwBrand.buttonLabel %></span>
+              </div></div>
+
+            <div class="gw-go" style="gap:8px">
+              <button type="submit" name="reset" value="1" class="gw-btn ghost" onclick="return confirm('Reset branding to the default theme?')">Reset</button>
+              <button type="submit" class="gw-btn"><%- icon('save', 15) %>Save branding</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.gw-tab');
+  function show(name) {
+    Array.prototype.forEach.call(tabs, function (t) { t.classList.toggle('on', t.getAttribute('data-tab') === name); });
+    ['create', 'list', 'settings'].forEach(function (n) { document.getElementById('pane-' + n).classList.toggle('on', n === name); });
+  }
+  Array.prototype.forEach.call(tabs, function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-tab')); }); });
+
+  var pick = document.getElementById('colorPick'), txt = document.getElementById('colorTxt'), prev = document.getElementById('prev');
+  function setColor(v) { if (/^#[0-9a-fA-F]{6}$/.test(v)) { prev.style.setProperty('--prev', v); pick.value = v; } }
+  pick.addEventListener('input', function () { txt.value = pick.value.toUpperCase(); setColor(pick.value); });
+  txt.addEventListener('input', function () { setColor(txt.value); });
+  function btn() { document.getElementById('prevBtn').textContent = (document.getElementById('btnEmoji').value + ' ' + document.getElementById('btnLabel').value).trim(); }
+  document.getElementById('btnEmoji').addEventListener('input', btn);
+  document.getElementById('btnLabel').addEventListener('input', btn);
+})();
+</script>
+<%- include('partials/foot') %>
+</body>
+</html>

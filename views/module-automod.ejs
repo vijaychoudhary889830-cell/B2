@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automod — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+<style>
+  /* ===== Automod module (SPIDEY red/dark theme) ===== */
+  .am-hero { padding: 20px 22px; margin-bottom: 14px; background: linear-gradient(135deg, #3a0810 0%, #1c0a12 60%, #130f16 100%); border: 1px solid rgba(255,59,78,.32); border-radius: 14px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .am-hero .eyebrow { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--red2); text-transform: uppercase; }
+  .am-hero h1 { font-family: var(--display); font-size: 22px; margin: 4px 0 0; }
+  .am-hero .pct { font-family: var(--display); font-size: 44px; font-weight: 800; line-height: 1; }
+  .am-master { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+  .am-master .ic { width: 42px; height: 42px; border-radius: 11px; background: rgba(255,59,78,.1); border: 1px solid rgba(255,59,78,.3); color: var(--red2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .am-master .nm { font-family: var(--display); font-size: 15px; font-weight: 800; text-transform: uppercase; }
+  .am-master .st { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+  .am-master .st i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .am-master .grow { flex: 1; min-width: 0; }
+  .st.on { color: var(--good); } .st.off { color: var(--muted); }
+
+  .am-flash { margin-bottom: 14px; padding: 11px 14px; border-radius: 11px; font-size: 13px; font-weight: 700; }
+  .am-flash.good { color: var(--good); background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); }
+  .am-flash.bad { color: var(--red2); background: rgba(255,59,78,.1); border: 1px solid rgba(255,59,78,.35); }
+  .am-toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 200; padding: 11px 16px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #1b1219; border: 1px solid rgba(255,59,78,.5); color: var(--text); box-shadow: 0 12px 30px rgba(0,0,0,.6); display: none; max-width: 92vw; }
+
+  .am-head { display: flex; align-items: flex-start; gap: 12px; }
+  .am-head .ic { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,59,78,.1); border: 1px solid rgba(255,59,78,.3); color: var(--red2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .am-head h2 { margin: 0; font-family: var(--display); font-size: 18px; text-transform: uppercase; }
+  .am-head p { margin: 3px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+  .am-head .side { margin-left: auto; text-align: right; font-size: 10px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .am-head .side b { display: block; color: var(--red2); font-size: 18px; letter-spacing: 0; }
+  .am-rule { display: flex; gap: 11px; margin-top: 12px; padding: 13px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; }
+  .am-rule .ri { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,59,78,.1); color: var(--red2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .am-rule .rn { font-size: 14px; font-weight: 800; }
+  .am-rule .rd { font-size: 11.5px; color: var(--muted); line-height: 1.5; margin-top: 3px; }
+  .am-rule .ctl { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 11px; }
+  .am-rule select { padding: 8px 10px; font-size: 11.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: #fbbf24; background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.3); border-radius: 9px; font-family: inherit; max-width: 62%; }
+  .am-rule.is-off .rn { opacity: .85; }
+  .am-bulk { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .am-bulk form { display: inline; }
+
+  .am-sub { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin: 16px 0 8px; display: flex; align-items: center; gap: 7px; }
+  .am-empty { text-align: center; padding: 22px 12px; border: 1px dashed var(--border); border-radius: 12px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: rgba(255,255,255,.02); margin-top: 12px; }
+  .am-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 13px; margin-top: 8px; background: var(--card2); border: 1px solid var(--border); border-radius: 11px; font-size: 13px; font-weight: 700; word-break: break-word; }
+  .am-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 9px; font-size: 12px; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: inherit; }
+  .am-btn.red { background: linear-gradient(135deg, #ff3b4e, #c4162a); color: #1a0306; border-color: rgba(255,59,78,.55); }
+  .am-btn.danger { color: var(--red2); border-color: rgba(255,59,78,.35); background: rgba(255,59,78,.06); }
+  .am-btn.sm { padding: 6px 10px; font-size: 11.5px; }
+
+  /* searchable picker */
+  .pk { position: relative; }
+  .pk-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,59,78,.4); background: rgba(255,59,78,.06); color: var(--red2); font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; font-family: inherit; text-align: left; }
+  .pk-pop { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 40; background: #17121b; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 8px; box-shadow: 0 18px 40px rgba(0,0,0,.6); }
+  .pk.open .pk-pop { display: block; }
+  .pk-search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--card2); color: var(--muted); }
+  .pk-search input { border: none !important; background: none !important; padding: 10px 0 !important; flex: 1; outline: none; color: var(--text); font-family: inherit; font-size: 13px; }
+  .pk-list { max-height: 230px; overflow-y: auto; margin-top: 6px; }
+  .pk-opt { padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .pk-opt:hover { background: rgba(255,59,78,.12); }
+  .pk-none { padding: 14px; text-align: center; color: var(--muted); font-size: 12.5px; }
+
+  .am-grid { display: grid; gap: 12px; } @media (min-width: 560px) { .am-grid { grid-template-columns: 1fr 1fr; } }
+  .am-field label { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .am-field input[type=number], .am-field input[type=text] { width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-family: inherit; font-size: 13px; font-weight: 700; outline: none; }
+  .am-field input:focus { border-color: rgba(255,59,78,.7); }
+  .am-row-add { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .am-statusline { margin-top: 12px; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .am-statusline b { color: var(--good); }
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'automod' }) %>
+<%- include('partials/topbar', { pageLabel: 'Automod' }) %>
+
+<%
+  const pctColor = amPct >= 70 ? 'var(--good)' : amPct >= 30 ? 'var(--warn)' : 'var(--red2)';
+  const picks = (list) => JSON.stringify(list).replace(/</g, '\\u003c');
+  const thr = amThresholds;
+%>
+
+      <!-- ===== HERO ===== -->
+      <div class="am-hero">
+        <div><div class="eyebrow">Moderation</div><h1>Automod Security</h1></div>
+        <div class="pct" id="heroPct" style="color:<%= pctColor %>"><%= amPct %>%</div>
+      </div>
+
+      <!-- ===== MASTER ===== -->
+      <div class="am-master">
+        <div class="ic"><%- icon('zap', 20) %></div>
+        <div class="grow">
+          <div class="nm">Automod master engine</div>
+          <div class="st <%= amMaster ? 'on' : 'off' %>" id="masterSt"><i></i><span><%= amMaster ? 'System armed' : 'System disarmed' %></span></div>
+        </div>
+        <label class="switch" title="Turn the whole automod system on or off">
+          <input type="checkbox" id="masterToggle" <%= amMaster ? 'checked' : '' %>><span class="slider"></span>
+        </label>
+      </div>
+
+      <% if (saved) { %><div class="am-flash good"><%= amMsg %></div><% } %>
+      <% if (error) { %><div class="am-flash bad"><%= error %></div><% } %>
+
+      <!-- ===== DETECTION MODULES ===== -->
+      <div class="glass panel">
+        <div class="am-head">
+          <div class="ic"><%- icon('sliders', 18) %></div>
+          <div><h2>Detection modules</h2><p>Configure triggers and automatic responses. Each rule has its own punishment.</p></div>
+          <div class="side">Active<br>modules<b id="armedNum"><%= amArmed %>/<%= amTotal %></b></div>
+        </div>
+
+        <div class="am-bulk">
+          <form action="/dashboard/<%= guildId %>/automod/all" method="POST"><input type="hidden" name="bulk" value="enable"><button class="am-btn sm" type="submit">Enable all</button></form>
+          <form action="/dashboard/<%= guildId %>/automod/all" method="POST"><input type="hidden" name="bulk" value="disable"><button class="am-btn sm" type="submit">Disable all</button></form>
+        </div>
+
+        <% amCategories.forEach((cat, ci) => { %>
+          <details class="armed-card" data-cat <%= ci === 0 ? 'open' : '' %> style="margin-top:12px">
+            <summary>
+              <div class="armed-ic" style="color:var(--red2)"><%- icon(cat.rules[0].icon, 18) %></div>
+              <div class="armed-title">
+                <div class="name"><%= cat.name %></div>
+                <div class="frac"><span class="catFrac"><%= cat.armed %>/<%= cat.total %></span> armed</div>
+              </div>
+              <div class="armed-pct catPct" style="color:<%= cat.armed ? 'var(--good)' : 'var(--muted)' %>;background:rgba(255,255,255,.05)"><%= cat.pct %>%</div>
+              <div class="armed-chev">▶</div>
+            </summary>
+            <div class="armed-track"><div class="armed-fill catBar" style="width:<%= cat.pct %>%;background:var(--good)"></div></div>
+            <div class="armed-body">
+              <% cat.rules.forEach(r => { %>
+                <div class="am-rule <%= r.enabled ? '' : 'is-off' %>" data-rule="<%= r.key %>">
+                  <div class="ri"><%- icon(r.icon, 17) %></div>
+                  <div style="flex:1;min-width:0">
+                    <div class="rn"><%= r.label %></div>
+                    <div class="rd"><%= r.desc %></div>
+                    <div class="ctl">
+                      <select class="punish" aria-label="Punishment for <%= r.label %>">
+                        <% amChoices.forEach(c => { %><option value="<%= c.value %>" <%= c.value === r.punish ? 'selected' : '' %>><%= c.label %></option><% }) %>
+                      </select>
+                      <label class="switch"><input type="checkbox" class="rtoggle" <%= r.enabled ? 'checked' : '' %>><span class="slider"></span></label>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </details>
+        <% }) %>
+      </div>
+
+      <!-- ===== IGNORED ROLES ===== -->
+      <div class="glass panel">
+        <div class="am-head"><div class="ic"><%- icon('user-plus', 18) %></div><div><h2>Ignored roles</h2><p>Roles that are immune to all automod detections and punishments.</p></div></div>
+        <div class="am-sub"><%- icon('users', 13) %>Add role to whitelist</div>
+        <div class="pk" data-type="role" data-form="roleForm" data-ph="Select a role to ignore" data-search="Search roles…">
+          <button type="button" class="pk-btn"><span>Select a role to ignore</span><%- icon('chevron-down', 15) %></button>
+          <div class="pk-pop"><div class="pk-search"><%- icon('search', 14) %><input type="text" placeholder="Search roles…" autocomplete="off"></div><div class="pk-list"></div></div>
+        </div>
+        <form id="roleForm" action="/dashboard/<%= guildId %>/automod/ignore" method="POST" style="display:none"><input type="hidden" name="type" value="role"><input type="hidden" name="actionType" value="add"><input type="hidden" name="id"></form>
+        <% if (!amIgnoredRoles.length) { %><div class="am-empty">No ignored roles added</div><% } %>
+        <% amIgnoredRoles.forEach(r => { %>
+          <div class="am-item"><span>@<%= r.name %></span>
+            <form action="/dashboard/<%= guildId %>/automod/ignore" method="POST" style="display:inline"><input type="hidden" name="type" value="role"><input type="hidden" name="actionType" value="remove"><input type="hidden" name="id" value="<%= r.id %>"><button class="am-btn danger sm" type="submit"><%- icon('trash', 12) %>Remove</button></form></div>
+        <% }) %>
+      </div>
+
+      <!-- ===== IGNORED CHANNELS ===== -->
+      <div class="glass panel">
+        <div class="am-head"><div class="ic"><%- icon('hash', 18) %></div><div><h2>Ignored channels</h2><p>Channels where automod will not monitor any messages.</p></div></div>
+        <div class="am-sub"><%- icon('hash', 13) %>Add channel to whitelist</div>
+        <div class="pk" data-type="channel" data-form="chanForm" data-ph="Select a channel to ignore" data-search="Search channels…">
+          <button type="button" class="pk-btn"><span>Select a channel to ignore</span><%- icon('chevron-down', 15) %></button>
+          <div class="pk-pop"><div class="pk-search"><%- icon('search', 14) %><input type="text" placeholder="Search channels…" autocomplete="off"></div><div class="pk-list"></div></div>
+        </div>
+        <form id="chanForm" action="/dashboard/<%= guildId %>/automod/ignore" method="POST" style="display:none"><input type="hidden" name="type" value="channel"><input type="hidden" name="actionType" value="add"><input type="hidden" name="id"></form>
+        <% if (!amIgnoredChannels.length) { %><div class="am-empty">No ignored channels added</div><% } %>
+        <% amIgnoredChannels.forEach(c => { %>
+          <div class="am-item"><span>#<%= c.name %></span>
+            <form action="/dashboard/<%= guildId %>/automod/ignore" method="POST" style="display:inline"><input type="hidden" name="type" value="channel"><input type="hidden" name="actionType" value="remove"><input type="hidden" name="id" value="<%= c.id %>"><button class="am-btn danger sm" type="submit"><%- icon('trash', 12) %>Remove</button></form></div>
+        <% }) %>
+      </div>
+
+      <!-- ===== LOGGING ===== -->
+      <div class="glass panel">
+        <div class="am-head"><div class="ic"><%- icon('book-open', 18) %></div><div><h2>Logging system</h2><p>Choose where automod sends enforcement logs: deletions and punishments in real time.</p></div></div>
+        <div class="pk" style="margin-top:14px" data-type="log" data-form="logForm" data-ph="<%= amLogChannelName ? '#' + amLogChannelName : 'Select log channel…' %>" data-search="Search channels…">
+          <button type="button" class="pk-btn"><span><%= amLogChannelName ? '#' + amLogChannelName : 'Select log channel…' %></span><%- icon('chevron-down', 15) %></button>
+          <div class="pk-pop"><div class="pk-search"><%- icon('search', 14) %><input type="text" placeholder="Search channels…" autocomplete="off"></div><div class="pk-list"></div></div>
+        </div>
+        <form id="logForm" action="/dashboard/<%= guildId %>/automod/log" method="POST" style="display:none"><input type="hidden" name="channelId"></form>
+        <div class="am-statusline">Status: <% if (amLogChannelName) { %><b>Configured</b> · #<%= amLogChannelName %> · <a href="#" id="logClear" style="color:var(--red2)">clear</a><% } else { %>Not configured<% } %></div>
+      </div>
+
+      <!-- ===== THRESHOLDS ===== -->
+      <div class="glass panel">
+        <div class="am-head"><div class="ic"><%- icon('sliders', 18) %></div><div><h2>Thresholds</h2><p>Fine-tune how sensitive each detection is.</p></div></div>
+        <form action="/dashboard/<%= guildId %>/automod/thresholds" method="POST" style="margin-top:14px">
+          <div class="am-grid">
+            <div class="am-field"><label>Spam: messages</label><input type="number" name="spamMessageLimit" value="<%= thr.spamMessageLimit %>" min="2" max="30"></div>
+            <div class="am-field"><label>Spam: within seconds</label><input type="number" name="spamWindowSeconds" value="<%= thr.spamWindowSeconds %>" min="2" max="60"></div>
+            <div class="am-field"><label>Emoji limit</label><input type="number" name="emojiLimit" value="<%= thr.emojiLimit %>" min="2" max="50"></div>
+            <div class="am-field"><label>Mention limit</label><input type="number" name="mentionLimit" value="<%= thr.mentionLimit %>" min="2" max="30"></div>
+            <div class="am-field"><label>Caps percent</label><input type="number" name="capsPercentThreshold" value="<%= thr.capsPercentThreshold %>" min="30" max="100"></div>
+            <div class="am-field"><label>Caps: min length</label><input type="number" name="capsMinLength" value="<%= thr.capsMinLength %>" min="5" max="200"></div>
+            <div class="am-field"><label>Raid: joins</label><input type="number" name="raidJoinLimit" value="<%= thr.raidJoinLimit %>" min="3" max="100"></div>
+            <div class="am-field"><label>Raid: within seconds</label><input type="number" name="raidWindowSeconds" value="<%= thr.raidWindowSeconds %>" min="3" max="120"></div>
+            <div class="am-field"><label>Raid: min account age (days)</label><input type="number" name="raidMinAccountAgeDays" value="<%= thr.raidMinAccountAgeDays %>" min="0" max="365"></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="am-btn red" type="submit"><%- icon('save', 14) %>Save thresholds</button></div>
+        </form>
+      </div>
+
+      <!-- ===== WORD & DOMAIN LISTS ===== -->
+      <div class="glass panel">
+        <div class="am-head"><div class="ic"><%- icon('ban', 18) %></div><div><h2>Word &amp; domain lists</h2><p>Banned words are used by Anti bad words. Allowed domains are ignored by Anti link.</p></div></div>
+
+        <div class="am-sub">Banned words — <%= amWords.length %></div>
+        <form class="am-row-add" action="/dashboard/<%= guildId %>/automod/words" method="POST"><input type="hidden" name="actionType" value="add">
+          <div class="am-field"><input type="text" name="word" placeholder="Add a banned word…" maxlength="60" autocomplete="off"></div><button class="am-btn red" type="submit"><%- icon('plus', 14) %>Add</button></form>
+        <% if (!amWords.length) { %><div class="am-empty">No banned words</div><% } %>
+        <% amWords.forEach(w => { %>
+          <div class="am-item"><span><%= w %></span>
+            <form action="/dashboard/<%= guildId %>/automod/words" method="POST" style="display:inline"><input type="hidden" name="actionType" value="remove"><input type="hidden" name="word" value="<%= w %>"><button class="am-btn danger sm" type="submit"><%- icon('trash', 12) %>Remove</button></form></div>
+        <% }) %>
+
+        <div class="am-sub" style="margin-top:22px">Allowed domains — <%= amDomains.length %></div>
+        <form class="am-row-add" action="/dashboard/<%= guildId %>/automod/domains" method="POST"><input type="hidden" name="actionType" value="add">
+          <div class="am-field"><input type="text" name="domain" placeholder="example.com" maxlength="100" autocomplete="off"></div><button class="am-btn red" type="submit"><%- icon('plus', 14) %>Allow</button></form>
+        <% if (!amDomains.length) { %><div class="am-empty">No allowed domains</div><% } %>
+        <% amDomains.forEach(d => { %>
+          <div class="am-item"><span><%= d %></span>
+            <form action="/dashboard/<%= guildId %>/automod/domains" method="POST" style="display:inline"><input type="hidden" name="actionType" value="remove"><input type="hidden" name="domain" value="<%= d %>"><button class="am-btn danger sm" type="submit"><%- icon('trash', 12) %>Remove</button></form></div>
+        <% }) %>
+      </div>
+
+      <div class="am-toast" id="toast"></div>
+
+<script type="application/json" id="amRoles"><%- picks(guildRoles) %></script>
+<script type="application/json" id="amChans"><%- picks(guildTextChannels) %></script>
+<script>
+(function () {
+  var BASE = '/dashboard/<%= guildId %>/automod';
+  var TOTAL = <%= amTotal %>;
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  var toastEl = $('#toast'), toastT;
+  function toast(msg) { toastEl.textContent = msg; toastEl.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(function () { toastEl.style.display = 'none'; }, 2600); }
+
+  function post(path, data) {
+    var body = new URLSearchParams(data).toString();
+    return fetch(BASE + path, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }, body: body })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Request failed'); return j; }); });
+  }
+
+  /* ----- live counters ----- */
+  function recount() {
+    var armed = 0;
+    $$('details[data-cat]').forEach(function (d) {
+      var boxes = $$('.rtoggle', d), on = boxes.filter(function (b) { return b.checked; }).length;
+      armed += on;
+      var pct = boxes.length ? Math.round(on / boxes.length * 100) : 0;
+      $('.catFrac', d).textContent = on + '/' + boxes.length;
+      var p = $('.catPct', d); p.textContent = pct + '%'; p.style.color = on ? 'var(--good)' : 'var(--muted)';
+      $('.catBar', d).style.width = pct + '%';
+    });
+    $('#armedNum').textContent = armed + '/' + TOTAL;
+    var pct = Math.round(armed / TOTAL * 100), hp = $('#heroPct');
+    hp.textContent = pct + '%'; hp.style.color = pct >= 70 ? 'var(--good)' : pct >= 30 ? 'var(--warn)' : 'var(--red2)';
+  }
+
+  /* ----- master ----- */
+  var master = $('#masterToggle');
+  master.addEventListener('change', function () {
+    var want = master.checked;
+    post('/master', { enabled: want }).then(function () {
+      var st = $('#masterSt'); st.className = 'st ' + (want ? 'on' : 'off'); $('span', st).textContent = want ? 'System armed' : 'System disarmed';
+      toast(want ? 'Automod armed' : 'Automod disarmed');
+    }).catch(function (e) { master.checked = !want; toast(e.message); });
+  });
+
+  /* ----- rule toggle + punishment ----- */
+  $$('.am-rule').forEach(function (row) {
+    var key = row.getAttribute('data-rule'), box = $('.rtoggle', row), sel = $('.punish', row), last = sel.value;
+    box.addEventListener('change', function () {
+      var want = box.checked;
+      row.classList.toggle('is-off', !want); recount();
+      post('/rule', { rule: key, enabled: want }).then(function () { toast($('.rn', row).textContent + (want ? ' enabled' : ' disabled')); })
+        .catch(function (e) { box.checked = !want; row.classList.toggle('is-off', want); recount(); toast(e.message); });
+    });
+    sel.addEventListener('change', function () {
+      var v = sel.value;
+      post('/rule', { rule: key, punish: v }).then(function () { last = v; toast('Punishment saved'); })
+        .catch(function (e) { sel.value = last; toast(e.message); });
+    });
+  });
+
+  /* ----- searchable pickers ----- */
+  var ROLES = JSON.parse($('#amRoles').textContent || '[]'), CHANS = JSON.parse($('#amChans').textContent || '[]');
+  $$('.pk').forEach(function (pk) {
+    var type = pk.getAttribute('data-type'), form = document.getElementById(pk.getAttribute('data-form'));
+    var data = type === 'role' ? ROLES : CHANS, prefix = type === 'role' ? '@' : '#';
+    var btn = $('.pk-btn', pk), input = $('input', pk), list = $('.pk-list', pk);
+    function render() {
+      var q = input.value.trim().toLowerCase();
+      var rows = data.filter(function (x) { return !q || x.name.toLowerCase().indexOf(q) !== -1; }).slice(0, 80);
+      list.innerHTML = rows.length ? rows.map(function (x) { return '<div class="pk-opt" data-id="' + esc(x.id) + '">' + prefix + esc(x.name) + '</div>'; }).join('') : '<div class="pk-none">Nothing found</div>';
+      $$('.pk-opt', list).forEach(function (el) {
+        el.addEventListener('click', function () { $('input[name=' + (type === 'log' ? 'channelId' : 'id') + ']', form).value = el.getAttribute('data-id'); form.submit(); });
+      });
+    }
+    btn.addEventListener('click', function (e) { e.stopPropagation(); $$('.pk.open').forEach(function (o) { if (o !== pk) o.classList.remove('open'); }); pk.classList.toggle('open'); if (pk.classList.contains('open')) { input.value = ''; render(); setTimeout(function () { input.focus(); }, 30); } });
+    input.addEventListener('input', render);
+    $('.pk-pop', pk).addEventListener('click', function (e) { e.stopPropagation(); });
+  });
+  document.addEventListener('click', function () { $$('.pk.open').forEach(function (o) { o.classList.remove('open'); }); });
+
+  var clr = $('#logClear');
+  if (clr) clr.addEventListener('click', function (e) { e.preventDefault(); $('input[name=channelId]', $('#logForm')).value = ''; $('#logForm').submit(); });
+})();
+</script>
+<%- include('partials/foot') %>
+</body>
+</html>

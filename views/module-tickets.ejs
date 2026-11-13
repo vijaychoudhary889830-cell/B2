@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tickets — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'tickets' }) %>
+<%- include('partials/topbar', { pageLabel: 'Tickets' }) %>
+
+      <form action="/dashboard/<%= guildId %>/tickets" method="POST">
+        <div class="glass panel">
+          <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>Tickets</h2></div>
+          <div class="toggle-row" style="border-top:none;padding-top:0;">
+            <div><div class="toggle-label">Enabled</div><div class="toggle-hint">Let members open private support tickets (<%= openTicketCount %> open now)</div></div>
+            <label class="switch"><input type="checkbox" name="enabled" <%= ticketSettings.enabled ? 'checked' : '' %>><span class="slider"></span></label>
+          </div>
+
+          <label class="lbl-sm">Panel Channel <span style="font-weight:400;">(where the "Open Ticket" button message goes)</span></label>
+          <select name="panelChannelId">
+            <option value="">— Select a channel —</option>
+            <% guildTextChannels.forEach(c => { %>
+              <option value="<%= c.id %>" <%= ticketSettings.panelChannelId === c.id ? 'selected' : '' %>>#<%= c.name %></option>
+            <% }) %>
+          </select>
+
+          <div class="row2">
+            <div>
+              <label class="lbl-sm">Ticket Category <span style="font-weight:400;">(optional)</span></label>
+              <select name="categoryId">
+                <option value="">— No category —</option>
+                <% guildCategories.forEach(c => { %>
+                  <option value="<%= c.id %>" <%= ticketSettings.categoryId === c.id ? 'selected' : '' %>><%= c.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div>
+              <label class="lbl-sm">Support Role <span style="font-weight:400;">(sees every ticket)</span></label>
+              <select name="supportRoleId">
+                <option value="">— No role —</option>
+                <% guildRoles.forEach(r => { %>
+                  <option value="<%= r.id %>" <%= ticketSettings.supportRoleId === r.id ? 'selected' : '' %>><%= r.name %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <label class="lbl-sm">Transcript Channel <span style="font-weight:400;">(closed tickets are logged here; blank = main log channel)</span></label>
+          <select name="logChannelId">
+            <option value="">— Use main log channel —</option>
+            <% guildTextChannels.forEach(c => { %>
+              <option value="<%= c.id %>" <%= ticketSettings.logChannelId === c.id ? 'selected' : '' %>>#<%= c.name %></option>
+            <% }) %>
+          </select>
+
+          <label class="lbl-sm">Panel Title</label>
+          <input type="text" name="panelTitle" value="<%= ticketSettings.panelTitle %>" placeholder="🎫 Support Tickets">
+          <label class="lbl-sm">Panel Message</label>
+          <textarea name="panelDescription" data-md placeholder="Explain how to get help. Members click the button below your text."><%= ticketSettings.panelDescription %></textarea>
+
+          <div class="row2">
+            <div><label class="lbl-sm">Button Label</label><input type="text" name="buttonLabel" value="<%= ticketSettings.buttonLabel %>" placeholder="Open Ticket"></div>
+            <div><label class="lbl-sm">Embed Color</label><input type="color" name="color" value="<%= ticketSettings.color %>"></div>
+          </div>
+
+          <div class="embed-preview" data-label="Panel preview" data-title-field="panelTitle" data-desc-field="panelDescription" data-color-field="color" data-button-field="buttonLabel" data-button-icon="🎫" data-fallback-title="🎫 Support Tickets" data-fallback-desc="Click the button below to open a ticket." data-fallback-button="Open Ticket"></div>
+
+          <label class="lbl-sm">Message inside a new ticket <span style="font-weight:400;">(use {user}, {server})</span></label>
+          <textarea name="welcomeMessage" data-md placeholder="What members see when their ticket opens. Use {user} and {server}."><%= ticketSettings.welcomeMessage %></textarea>
+
+          <div class="embed-preview" data-label="Inside a new ticket" data-fixed-title="🎫 Ticket #0001" data-desc-field="welcomeMessage" data-color-field="color" data-ping="1" data-button-icon="🔒" data-button-style="danger" data-button-field="__close" data-fallback-button="Close Ticket" data-fallback-desc="Hey {user}, thanks for opening a ticket! Tell us what you need and a staff member will be with you shortly."></div>
+
+          <label class="lbl-sm">Max open tickets per member</label>
+          <input type="number" name="maxOpenPerUser" min="1" max="10" value="<%= ticketSettings.maxOpenPerUser %>">
+
+          <button type="submit" class="save-btn">Save Tickets</button>
+        </div>
+
+        <div class="glass panel">
+          <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Post the panel</h2></div>
+          <p class="toggle-hint" style="margin:0 0 12px;">Saves the settings above, then posts the button message to the panel channel. Post it again after changing the title, text or button.</p>
+          <button type="submit" class="save-btn" formaction="/dashboard/<%= guildId %>/tickets/panel">Save &amp; Post Ticket Panel</button>
+        </div>
+      </form>
+
+<%- include('partials/editor') %>
+<%- include('partials/foot') %>
+</body>
+</html>

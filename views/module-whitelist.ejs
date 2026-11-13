@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Whitelist — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'whitelist' }) %>
+<%- include('partials/topbar', { pageLabel: 'Whitelist' }) %>
+
+      <div class="glass panel">
+        <div class="panel-head"><h2>✅ Whitelist — <%= whitelistCount %> user(s)</h2></div>
+        <% if (whitelistEntries.length === 0) { %>
+          <p class="list-empty">No whitelisted users yet.</p>
+        <% } else { %>
+          <% whitelistEntries.forEach(w => { %>
+            <div class="list-row">
+              <span><%= w.userId %> <span style="color:var(--muted);font-size:11px;">(<%= w.permissions %>)</span></span>
+              <form action="/dashboard/<%= guildId %>/whitelist" method="POST" style="display:inline">
+                <input type="hidden" name="actionType" value="remove">
+                <input type="hidden" name="userId" value="<%= w.userId %>">
+                <button type="submit" class="mini-btn">Remove</button>
+              </form>
+            </div>
+          <% }) %>
+        <% } %>
+        <form action="/dashboard/<%= guildId %>/whitelist" method="POST" style="margin-top:12px;">
+          <input type="hidden" name="actionType" value="add">
+          <label class="lbl-sm">Add User ID</label>
+          <div class="row2">
+            <input type="text" name="userId" placeholder="e.g. 123456789012345678">
+            <button type="submit" class="save-btn" style="margin-top:0;">Add to Whitelist</button>
+          </div>
+        </form>
+      </div>
+
+<%- include('partials/foot') %>
+</body>
+</html>

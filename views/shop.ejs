@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<title>Shop — SPIDEY Premium</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<%
+  // Corner spider-web artwork. More rings = a denser web, so longer plans look richer.
+  function webSvg(rings) {
+    var cx = 200, cy = 0, spokes = 7, maxR = 230, out = '';
+    function pt(i, r) { var a = Math.PI / 2 + i * (Math.PI / 2) / (spokes - 1); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
+    for (var i = 0; i < spokes; i++) { var e = pt(i, maxR); out += 'M' + cx + ' ' + cy + 'L' + e[0].toFixed(1) + ' ' + e[1].toFixed(1); }
+    for (var k = 1; k <= rings; k++) {
+      var r = maxR * k / (rings + 0.6), p = pt(0, r);
+      out += 'M' + p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+      for (var j = 1; j < spokes; j++) {
+        var q = pt(j, r), m = pt(j - 0.5, r * 0.84);
+        out += 'Q' + m[0].toFixed(1) + ' ' + m[1].toFixed(1) + ' ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1);
+      }
+    }
+    return '<svg class="web" viewBox="0 0 200 150" preserveAspectRatio="xMaxYMin slice" aria-hidden="true"><path d="' + out + '" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>';
+  }
+  var order = ['week', 'month', 'months4', 'lifetime'];
+  var rings = { week: 2, month: 3, months4: 5, lifetime: 7 };
+  var m = plans.month;
+  function savePct(p) { var full = m.priceInr * (p.days / m.days); return full > p.priceInr ? Math.round((1 - p.priceInr / full) * 100) : 0; }
+  var tags = { month: 'Popular', lifetime: 'Lifetime offer' };
+  if (savePct(plans.months4) > 0) tags.months4 = 'Save ' + savePct(plans.months4) + '%';
+  var many = guilds.length > 1;
+%>
+<style>
+  :root {
+    --ink: #08060a; --ink2: #0f0c12; --panel: #130f16; --card: #17111a; --line: rgba(255,255,255,0.09);
+    --red: #ff3b4e; --red-soft: #ff8a96; --ice: #8fd8ff; --ok: #3ddc84; --text: #f5f1f3; --muted: #a79fa6;
+    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
+  body {
+    margin: 0; color: var(--text); font-family: var(--body); line-height: 1.5; min-height: 100vh;
+    background: radial-gradient(900px 520px at 8% -8%, rgba(255,59,78,0.22), transparent 60%), var(--ink);
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; border-radius: 10px; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px 56px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; max-width: 880px; margin: 0 auto; padding: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 19px; text-decoration: none; }
+  .brand img { width: 32px; height: 32px; border-radius: 9px; object-fit: cover; border: 1px solid var(--line); }
+  .links { display: flex; gap: 20px; align-items: center; font-size: 14px; font-weight: 500; }
+  .links a { color: var(--muted); text-decoration: none; }
+  .links a:hover, .links a[aria-current] { color: var(--text); }
+  @media (max-width: 520px) { .links .opt { display: none; } }
+
+  /* Banner */
+  .hero { position: relative; overflow: hidden; border-radius: 20px; border: 1px solid var(--line); min-height: 210px; padding: 26px 22px; display: flex; flex-direction: column; justify-content: flex-end;
+    background: radial-gradient(520px 260px at 85% 0%, rgba(255,59,78,0.55), transparent 65%), linear-gradient(160deg, #240a12, #0d070b); }
+  .hero .web { position: absolute; top: 0; right: 0; width: 78%; height: 100%; color: rgba(255,170,180,0.55); }
+  .hero > *:not(.web) { position: relative; }
+  .hero h1 { margin: 0 0 6px; font-family: var(--display); font-weight: 800; font-size: clamp(30px, 8vw, 46px); line-height: 1.05; letter-spacing: -0.02em; }
+  .hero p { margin: 0; max-width: 36ch; color: #e2d6da; font-size: 15px; }
+
+  /* Server picker */
+  .picker { margin: 16px 0 6px; display: flex; flex-direction: column; gap: 8px; }
+  .picker label { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .picker select { width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; }
+  .picker select:focus { outline: none; border-color: var(--red); }
+  .picker.need select { border-color: var(--red); }
+  .note { font-size: 13.5px; color: var(--muted); margin: 0; }
+  .note a { color: var(--red-soft); }
+  .note.err { color: #ffc2c8; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; border: none; background: var(--red); color: #1a0306; cursor: pointer; font-family: inherit; }
+  .btn:hover { background: #ff5566; }
+  .gate { margin: 16px 0 6px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+
+  /* Plan cards */
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 12px; }
+  .section-title h2 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 22px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { position: relative; overflow: hidden; text-align: left; font: inherit; color: var(--text); cursor: pointer; padding: 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; display: flex; flex-direction: column; min-height: 230px; transition: border-color .15s; }
+  .card:hover { border-color: rgba(255,59,78,0.6); }
+  .art { position: relative; flex: 1; min-height: 120px; background: radial-gradient(260px 160px at 100% 0%, rgba(255,59,78,var(--glow)), transparent 70%), linear-gradient(170deg, #22101a, #130c12); }
+  .art .web { position: absolute; inset: 0; width: 100%; height: 100%; color: rgba(255,150,162,var(--web)); }
+  .tag { position: absolute; top: 12px; left: 12px; z-index: 1; font-size: 12.5px; font-weight: 700; padding: 5px 11px; border-radius: 999px; background: #fff; color: #1a0306; }
+  .info { padding: 12px 14px 14px; background: linear-gradient(180deg, rgba(23,17,26,0), var(--card) 30%); margin-top: -28px; position: relative; }
+  .info h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 19px; }
+  .info .sub { font-size: 13px; color: var(--muted); }
+  .price { margin-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .price b { font-family: var(--display); font-weight: 800; font-size: 22px; }
+  .price s { font-size: 13px; color: var(--muted); }
+  .price small { font-size: 12px; color: var(--muted); }
+  .card.featured { border-color: rgba(255,59,78,0.55); }
+  .card[aria-busy="true"] { opacity: .6; }
+
+  /* Included */
+  .inc { margin: 28px 0 0; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+  .inc h2 { margin: 0 0 10px; font-family: var(--display); font-weight: 800; font-size: 18px; }
+  .inc ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; font-size: 14.5px; }
+  .inc li { display: flex; gap: 10px; color: #e2d6da; }
+  .inc li::before { content: ''; flex: 0 0 8px; height: 8px; margin-top: 8px; border-radius: 50%; background: var(--red); }
+  .fine { margin: 18px 0 0; font-size: 12.5px; color: var(--muted); }
+  .fine a { color: var(--red-soft); }
+  .warn { margin: 16px 0 0; padding: 12px 14px; border-radius: 12px; background: rgba(255,59,78,0.12); border: 1px solid rgba(255,59,78,0.4); color: #ffc2c8; font-size: 13.5px; }
+  .warn a { color: var(--red-soft); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/"><img src="/logo.png" alt=""> SPIDEY</a>
+  <nav class="links" aria-label="Main">
+    <%- include('partials/home-btn') %>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/shop" aria-current="page">Shop</a>
+    <a class="opt" href="/support">Support</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <%- webSvg(6) %>
+    <h1>SPIDEY Premium</h1>
+    <p>Unlock the premium dashboard features and commands for one server. Pick a plan and pay once.</p>
+  </section>
+
+  <% if (!payEnabled) { %>
+    <div class="warn">Online payment isn't switched on yet. You can <a href="<%= contactUrl %>">get a Premium key</a> instead.</div>
+  <% } %>
+
+  <% if (!user) { %>
+    <div class="gate">
+      <p class="note">Log in with Discord so Premium can be activated on your server.</p>
+      <a class="btn" href="/login?next=/shop">Log in with Discord</a>
+    </div>
+  <% } else if (!guilds.length) { %>
+    <div class="gate">
+      <p class="note">SPIDEY isn't in any server you manage yet. Add it to one first, then come back.</p>
+      <a class="btn" href="/dashboard">Add SPIDEY to a server</a>
+    </div>
+  <% } else { %>
+    <div class="picker" id="picker">
+      <label for="guild">Activate Premium on</label>
+      <select id="guild">
+        <% if (many) { %><option value="">Choose a server</option><% } %>
+        <% guilds.forEach(function (g) { %><option value="<%= g.id %>"><%= g.name %><%= g.premium ? ' (Premium active)' : '' %></option><% }) %>
+      </select>
+      <p class="note err" id="pickMsg" hidden>Choose a server first.</p>
+    </div>
+  <% } %>
+
+  <div class="section-title"><h2>Choose a plan</h2></div>
+  <div class="grid">
+    <% order.forEach(function (k) { var p = plans[k]; %>
+    <button type="button" class="card<%= p.lifetime ? ' featured' : '' %>" data-plan="<%= p.key %>" aria-label="<%= p.label %>, ₹<%= p.priceInr %>">
+      <div class="art" style="--glow:<%= (0.18 + rings[k] * 0.05).toFixed(2) %>;--web:<%= (0.22 + rings[k] * 0.06).toFixed(2) %>">
+        <% if (tags[k]) { %><span class="tag"><%= tags[k] %></span><% } %>
+        <%- webSvg(rings[k]) %>
+      </div>
+      <div class="info">
+        <h3><%= p.label %></h3>
+        <div class="sub"><%= p.lifetime ? 'Pay once, keep it for good' : p.days + ' days of Premium' %></div>
+        <div class="price"><b>₹<%= p.priceInr %></b><% if (p.wasInr) { %><s>₹<%= p.wasInr %></s><% } %><small>or $<%= p.priceUsd %></small></div>
+      </div>
+    </button>
+    <% }) %>
+
+  </div>
+
+  <section class="inc">
+    <h2>What you get</h2>
+    <ul>
+      <li>Premium dashboard features, like the Bot Profile page for a custom bot name and avatar on your server</li>
+      <li>Access to premium-only commands</li>
+      <li>Premium applies to one server. Buying again for the same server adds to the time you already have</li>
+    </ul>
+  </section>
+
+  <p class="fine">All payments are one-time, not subscriptions. By buying you agree to our <a href="/terms">Terms</a> and <a href="/refund">Refund Policy</a>. Need help? <a href="/support">Contact support</a>.</p>
+</main>
+<%- include('partials/site-footer') %>
+
+<script>
+(function () {
+  var loggedIn = <%- JSON.stringify(!!user) %>;
+  var hasGuilds = <%- JSON.stringify(guilds.length > 0) %>;
+  var sel = document.getElementById('guild');
+  var picker = document.getElementById('picker');
+  var pickMsg = document.getElementById('pickMsg');
+  if (sel && sel.options.length === 1) sel.selectedIndex = 0;
+  if (sel) sel.addEventListener('change', function () { picker.classList.remove('need'); pickMsg.hidden = true; });
+
+  document.querySelectorAll('.card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var plan = card.getAttribute('data-plan');
+      if (!loggedIn) { location.href = '/login?next=/shop'; return; }
+      if (!hasGuilds) { location.href = '/dashboard'; return; }
+      if (!sel.value) {
+        picker.classList.add('need'); pickMsg.hidden = false;
+        picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      card.setAttribute('aria-busy', 'true');
+      location.href = '/dashboard/' + encodeURIComponent(sel.value) + '/checkout?plan=' + encodeURIComponent(plan);
+    });
+  });
+})();
+</script>
+</body>
+</html>

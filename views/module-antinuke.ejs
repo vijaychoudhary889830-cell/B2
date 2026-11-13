@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antinuke — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+<style>
+  /* ===== Antinuke module (SPIDEY red/dark theme) ===== */
+  .an-hero { padding: 22px; margin-bottom: 16px; background: linear-gradient(135deg, #2a060d 0%, #130f16 70%); border: 1px solid rgba(255,59,78,.28); border-radius: 14px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .an-hero h1 { font-family: var(--display); font-size: 22px; margin: 4px 0 6px; }
+  .an-hero p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; max-width: 340px; }
+  .an-eyebrow { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--red2); text-transform: uppercase; }
+  .an-score { text-align: right; }
+  .an-score .lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--muted); }
+  .an-score .num { font-family: var(--display); font-size: 44px; line-height: 1; font-weight: 800; }
+
+  .an-stats { display: grid; gap: 10px; margin-bottom: 16px; }
+  .an-stat { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+  .an-stat .ic { width: 42px; height: 42px; border-radius: 11px; background: var(--card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--red2); }
+  .an-stat .k { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .an-stat .v { font-size: 18px; font-weight: 800; margin-top: 1px; }
+  .an-stat .grow { flex: 1; min-width: 0; }
+  .v-good { color: var(--good); } .v-warn { color: var(--warn); } .v-off { color: var(--muted); }
+
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+  .pill.good { color: var(--good); background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3); }
+  .pill.warn { color: var(--warn); background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); }
+  .pill.off { color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid var(--border); }
+  .pill.red { color: var(--red2); background: rgba(255,59,78,.12); border: 1px solid rgba(255,59,78,.35); }
+  .pill.gold { color: #fbbf24; background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.35); }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .an-sub { color: var(--muted); font-size: 12.5px; margin: -6px 0 14px; }
+  .ev { border: 1px solid var(--border); background: var(--card2); border-radius: 12px; padding: 13px; margin-top: 10px; }
+  .ev-head { display: flex; gap: 11px; align-items: flex-start; }
+  .ev-ic { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,59,78,.1); color: var(--red2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ev-name { font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ev-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; margin-top: 3px; }
+  .ev-ctrl { display: flex; align-items: flex-end; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .ev-ctrl .f { display: flex; flex-direction: column; gap: 4px; }
+  .ev-ctrl .f span { font-size: 9.5px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .ev-ctrl select { width: 86px; padding: 7px 10px; font-size: 12.5px; font-weight: 700; }
+  .ev-ctrl .sw { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; color: var(--muted); }
+
+  .save-bar { position: sticky; bottom: 12px; z-index: 5; display: flex; justify-content: flex-end; margin-top: 14px; }
+  .save-bar .save-btn { margin: 0; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+
+  /* people cards (extra owners + whitelist) */
+  .person { background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 12px; }
+  .person-top { display: flex; gap: 14px; align-items: center; }
+  .avatar { width: 64px; height: 64px; border-radius: 14px; object-fit: cover; background: var(--card); border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 22px; color: var(--red2); overflow: hidden; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .person-name { font-size: 16px; font-weight: 800; word-break: break-word; }
+  .person-handle { font-size: 12px; color: var(--muted); margin: 1px 0 6px; }
+  .person-id { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); font-family: ui-monospace, Menlo, Consolas, monospace; margin-top: 6px; word-break: break-all; }
+  .person-id button { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px; display: inline-flex; }
+  .person-id button:hover { color: var(--text); }
+  .person-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .abtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: inherit; }
+  .abtn:hover { border-color: rgba(255,255,255,.3); }
+  .abtn.danger { color: var(--red2); border-color: rgba(255,59,78,.35); background: rgba(255,59,78,.06); }
+  .abtn.danger:hover { background: rgba(255,59,78,.14); border-color: rgba(255,59,78,.6); }
+  .perm-bar { margin: 8px 0 0; }
+  .perm-bar .t { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #86efac; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.28); padding: 4px 9px; border-radius: 8px; }
+  .chip-lbl { font-size: 10px; font-weight: 800; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-top: 14px; }
+  .access-note { margin-top: 14px; padding: 12px 14px; border: 1px solid rgba(251,191,36,.3); background: rgba(251,191,36,.06); border-radius: 11px; font-size: 12px; color: var(--muted); line-height: 1.55; }
+  .access-note b.t { color: #fbbf24; display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  .access-note b { color: var(--text); }
+  .locked-note { padding: 11px 14px; border-radius: 11px; background: rgba(255,255,255,.04); border: 1px dashed var(--border); color: var(--muted); font-size: 12.5px; }
+
+  /* picker */
+  .picker { position: relative; }
+  .picker-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 14px; border-radius: 10px; border: 1px solid rgba(255,59,78,.4); background: rgba(255,59,78,.06); color: var(--red2); font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+  .picker-btn:hover { background: rgba(255,59,78,.12); }
+  .picker-pop { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 30; background: #17121b; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 8px; box-shadow: 0 18px 40px rgba(0,0,0,.6); }
+  .picker.open .picker-pop { display: block; }
+  .picker-search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--card2); color: var(--muted); }
+  .picker-search input { border: none !important; background: none !important; padding: 10px 0 !important; flex: 1; outline: none; }
+  .picker-list { max-height: 250px; overflow-y: auto; margin-top: 6px; }
+  .pick { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 9px; cursor: pointer; }
+  .pick:hover { background: rgba(255,59,78,.1); }
+  .pick .mini { width: 32px; height: 32px; border-radius: 9px; background: var(--card2); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--red2); }
+  .pick .mini img { width: 100%; height: 100%; object-fit: cover; }
+  .pick .nm { font-size: 13px; font-weight: 700; } .pick .hd { font-size: 11px; color: var(--muted); }
+  .picker-empty { padding: 14px; text-align: center; color: var(--muted); font-size: 12.5px; }
+
+  /* modal */
+  .modal-back { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 100; align-items: center; justify-content: center; padding: 14px; }
+  .modal-back.open { display: flex; }
+  .modal { width: 100%; max-width: 460px; max-height: 92vh; display: flex; flex-direction: column; background: #130f16; border: 1px solid rgba(255,59,78,.3); border-radius: 16px; padding: 18px; box-shadow: 0 30px 70px rgba(0,0,0,.7); }
+  .modal-h { display: flex; gap: 12px; align-items: flex-start; }
+  .modal-h .plus { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,59,78,.15); border: 1px solid rgba(255,59,78,.4); color: var(--red2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-h h3 { margin: 0; font-family: var(--display); font-size: 17px; text-transform: uppercase; letter-spacing: .02em; }
+  .modal-h p { margin: 3px 0 0; font-size: 12px; color: var(--muted); }
+  .modal-x { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px; }
+  .modal-user { display: flex; align-items: center; gap: 12px; margin: 14px 0 10px; padding: 11px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; }
+  .modal-user .avatar { width: 44px; height: 44px; border-radius: 11px; font-size: 16px; }
+  .modal-sec { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .modal-list { overflow-y: auto; flex: 1; min-height: 120px; padding-right: 2px; }
+  .perm-cat { font-size: 10px; font-weight: 800; letter-spacing: .12em; color: var(--red2); text-transform: uppercase; margin: 12px 0 6px; }
+  .perm-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; margin-bottom: 6px; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-weight: 700; }
+  .modal-foot { margin-top: 12px; display: grid; gap: 8px; }
+  .modal-foot .save-btn { margin: 0; width: 100%; padding: 12px; }
+  .modal-foot .cancel { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 11px; border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .mini-btn.green { color: var(--good); }
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'antinuke' }) %>
+<%- include('partials/topbar', { pageLabel: 'Antinuke' }) %>
+
+<%
+  function tierOf(pct) { return pct >= 91 ? 'secure' : pct >= 71 ? 'prot' : pct >= 40 ? 'mod' : 'risk'; }
+  const TIER_COLOR = { risk: 'var(--danger)', mod: 'var(--warn)', prot: 'var(--good)', secure: 'var(--good)' };
+  const pctAll = antinukeTotal ? Math.round((antinukeEnabled / antinukeTotal) * 100) : 0;
+  const heroTier = tierOf(pctAll);
+  const allOn = antinukeTotal > 0 && antinukeEnabled === antinukeTotal;
+  const allOff = antinukeEnabled === 0;
+  const statusText = allOn ? 'Enabled' : allOff ? 'Disabled' : 'Partial';
+  const statusClass = allOn ? 'v-good' : allOff ? 'v-off' : 'v-warn';
+  const initial = (n) => String(n || '?').trim().charAt(0).toUpperCase() || '?';
+  const wlJson = JSON.stringify(whitelist.reduce((m, w) => { m[w.id] = w.perms; return m; }, {})).replace(/</g, '\\u003c');
+  const eventsJson = JSON.stringify(eventMeta).replace(/</g, '\\u003c');
+%>
+
+      <!-- ===== HERO ===== -->
+      <div class="an-hero">
+        <div>
+          <div class="an-eyebrow">Security</div>
+          <h1>Security &amp; Anti-Nuke</h1>
+          <p>Protect your server from malicious attacks and unauthorized actions.</p>
+        </div>
+        <div class="an-score">
+          <div class="lbl">SCORE</div>
+          <div class="num" style="color:<%= TIER_COLOR[heroTier] %>"><%= pctAll %>%</div>
+        </div>
+      </div>
+
+      <!-- ===== STATS + MASTER TOGGLE ===== -->
+      <div class="an-stats">
+        <div class="an-stat">
+          <div class="ic"><%- icon('shield-check', 20) %></div>
+          <div class="grow"><div class="k">Protection status</div><div class="v <%= statusClass %>"><%= statusText %></div></div>
+        </div>
+        <div class="an-stat">
+          <div class="ic"><%- icon('zap', 20) %></div>
+          <div class="grow"><div class="k">Protected events</div><div class="v"><%= antinukeEnabled %>/<%= antinukeTotal %></div></div>
+        </div>
+        <form class="an-stat" action="/dashboard/<%= guildId %>/antinuke/all" method="POST">
+          <input type="hidden" name="bulk" id="bulkVal" value="<%= allOn ? 'disable' : 'enable' %>">
+          <div class="ic"><%- icon('lock', 20) %></div>
+          <div class="grow"><div class="k">Antinuke</div><div class="v <%= allOn ? 'v-good' : 'v-off' %>"><%= allOn ? 'Active' : allOff ? 'Off' : 'Partly on' %></div></div>
+          <label class="switch" title="Enable / disable every protection">
+            <input type="checkbox" <%= allOn ? 'checked' : '' %> onchange="document.getElementById('bulkVal').value = this.checked ? 'enable' : 'disable'; this.form.submit();">
+            <span class="slider"></span>
+          </label>
+        </form>
+      </div>
+
+      <!-- ===== EVENT CATEGORIES ===== -->
+      <div class="glass panel">
+        <div class="panel-head">
+          <h2><%- icon('sliders', 16, 'margin-right:7px;') %>Antinuke Options</h2>
+          <div class="btn-row">
+            <form action="/dashboard/<%= guildId %>/antinuke/all" method="POST" style="display:inline"><input type="hidden" name="bulk" value="enable"><button class="mini-btn green" type="submit">Enable All</button></form>
+            <form action="/dashboard/<%= guildId %>/antinuke/all" method="POST" style="display:inline"><input type="hidden" name="bulk" value="disable"><button class="mini-btn" type="submit">Disable All</button></form>
+          </div>
+        </div>
+        <p class="an-sub">Limit = how many times someone can do this within 15 seconds before they are punished.</p>
+
+        <form action="/dashboard/<%= guildId %>/antinuke" method="POST">
+          <% antinukeByCategory.forEach((cat, ci) => {
+            const total = cat.events.length;
+            const enabled = cat.events.filter(e => e.enabled).length;
+            const pct = total ? Math.round((enabled / total) * 100) : 0;
+            const full = enabled === total, none = enabled === 0;
+          %>
+            <details class="armed-card" <%= ci === 0 ? 'open' : '' %>>
+              <summary>
+                <div class="armed-ic" style="color:var(--red2)"><%- categoryIcon(cat.category, 18) %></div>
+                <div class="armed-title">
+                  <div class="name"><%= cat.category %></div>
+                  <div class="frac"><%= total %> events &nbsp;
+                    <span class="pill <%= full ? 'good' : none ? 'off' : 'warn' %>"><%= full ? 'Fully protected' : none ? 'Not protected' : 'Partial' %></span>
+                  </div>
+                </div>
+                <div class="armed-pct" style="color:<%= full ? 'var(--good)' : none ? 'var(--muted)' : 'var(--warn)' %>;background:rgba(255,255,255,.05)"><%= enabled %>/<%= total %></div>
+                <div class="armed-chev">▶</div>
+              </summary>
+              <div class="armed-track"><div class="armed-fill" style="width:<%= pct %>%;background:<%= full ? 'var(--good)' : 'var(--warn)' %>"></div></div>
+              <div class="armed-body">
+                <% cat.events.forEach(ev => { %>
+                  <div class="ev">
+                    <div class="ev-head">
+                      <div class="ev-ic"><%- eventIcon(ev.key, 17) %></div>
+                      <div style="flex:1;min-width:0">
+                        <div class="ev-name"><%= ev.label %>
+                          <span class="pill <%= ev.enabled ? 'good' : 'off' %>"><i class="dot"></i><%= ev.enabled ? 'Protected' : 'Off' %></span>
+                        </div>
+                        <div class="ev-desc"><%= ev.description %></div>
+                      </div>
+                    </div>
+                    <div class="ev-ctrl">
+                      <div class="f"><span>Limit</span>
+                        <select name="limit_<%= ev.key %>">
+                          <% for (let n = 1; n <= maxLimit; n++) { %><option value="<%= n %>" <%= ev.limit === n ? 'selected' : '' %>><%= n %></option><% } %>
+                        </select>
+                      </div>
+                      <div class="f"><span>Action</span>
+                        <select name="action_<%= ev.key %>">
+                          <option value="ban" <%= ev.action === 'ban' ? 'selected' : '' %>>Ban</option>
+                          <option value="kick" <%= ev.action === 'kick' ? 'selected' : '' %>>Kick</option>
+                        </select>
+                      </div>
+                      <div class="sw">ON
+                        <label class="switch"><input type="checkbox" name="enabled_<%= ev.key %>" <%= ev.enabled ? 'checked' : '' %>><span class="slider"></span></label>
+                      </div>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            </details>
+          <% }) %>
+          <div class="save-bar"><button type="submit" class="save-btn"><%- icon('save', 16) %>Save Antinuke Config</button></div>
+        </form>
+      </div>
+
+      <!-- ===== EXTRA OWNERS ===== -->
+      <div class="glass panel">
+        <div class="panel-head"><h2><%- icon('crown', 16, 'margin-right:7px;') %>Extra Owners — <%= owners.length %></h2></div>
+        <p class="an-sub">Users who can manage Antinuke features. They are never punished by Antinuke.</p>
+
+        <% if (isServerOwner) { %>
+          <div class="picker" id="ownerPicker" data-bots="0">
+            <button type="button" class="picker-btn"><span style="display:inline-flex;align-items:center;gap:8px"><%- icon('user-plus', 15) %>Select a user from server</span><%- icon('chevron-down', 15) %></button>
+            <div class="picker-pop">
+              <div class="picker-search"><%- icon('search', 15) %><input type="text" placeholder="Search name or paste a user ID…" autocomplete="off"></div>
+              <div class="picker-list"></div>
+            </div>
+          </div>
+          <form id="ownerAddForm" action="/dashboard/<%= guildId %>/owners" method="POST" style="display:none">
+            <input type="hidden" name="actionType" value="add"><input type="hidden" name="userId" id="ownerAddId">
+          </form>
+        <% } else { %>
+          <div class="locked-note"><%- icon('lock', 14, 'margin-right:6px;') %>Only the server owner can add or remove extra owners.</div>
+        <% } %>
+
+        <% if (owners.length === 0) { %>
+          <p class="list-empty">No extra owners configured yet.</p>
+        <% } %>
+        <% owners.forEach(o => { %>
+          <div class="person">
+            <div class="person-top">
+              <div class="avatar"><% if (o.avatarUrl) { %><img src="<%= o.avatarUrl %>" alt="" loading="lazy"><% } else { %><%= initial(o.displayName) %><% } %></div>
+              <div style="min-width:0">
+                <div class="person-name"><%= o.displayName %></div>
+                <div class="person-handle">@<%= o.username %></div>
+                <span class="pill gold"><%- icon('crown', 11) %>Extra owner</span>
+                <div class="person-id"><span><%= o.id %></span><button type="button" onclick="copyText('<%= o.id %>', this)" title="Copy ID"><%- icon('copy', 13) %></button></div>
+              </div>
+            </div>
+            <% if (isServerOwner) { %>
+              <div class="person-actions">
+                <form action="/dashboard/<%= guildId %>/owners" method="POST" onsubmit="return confirm('Remove this extra owner?')">
+                  <input type="hidden" name="actionType" value="remove"><input type="hidden" name="userId" value="<%= o.id %>">
+                  <button type="submit" class="abtn danger"><%- icon('trash', 14) %>Remove</button>
+                </form>
+              </div>
+            <% } %>
+            <div class="access-note"><b class="t"><%- icon('crown', 13) %>Full administrative access</b>
+              This user has <b>full root access</b>. They can manage all <b>dashboard modules</b>, <b>Antinuke settings</b>, the <b>whitelist</b> and <b>global security policies</b>.</div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- ===== WHITELIST ===== -->
+      <div class="glass panel">
+        <div class="panel-head">
+          <h2><%- icon('list-checks', 16, 'margin-right:7px;') %>Whitelisted Users — <%= whitelist.length %></h2>
+          <% if (whitelist.length) { %>
+            <form action="/dashboard/<%= guildId %>/whitelist" method="POST" onsubmit="return confirm('Remove ALL users from the whitelist?')">
+              <input type="hidden" name="actionType" value="reset">
+              <button type="submit" class="abtn danger"><%- icon('refresh', 13) %>Reset all</button>
+            </form>
+          <% } %>
+        </div>
+        <p class="an-sub">Users who are exempt from the security actions you choose for them.</p>
+
+        <div class="picker" id="wlPicker" data-bots="1">
+          <button type="button" class="picker-btn"><span style="display:inline-flex;align-items:center;gap:8px"><%- icon('user-plus', 15) %>Add user to whitelist</span><%- icon('chevron-down', 15) %></button>
+          <div class="picker-pop">
+            <div class="picker-search"><%- icon('search', 15) %><input type="text" placeholder="Search name or paste a user ID…" autocomplete="off"></div>
+            <div class="picker-list"></div>
+          </div>
+        </div>
+
+        <% if (whitelist.length === 0) { %>
+          <p class="list-empty">No whitelisted users yet.</p>
+        <% } %>
+        <% whitelist.forEach(w => {
+          const trusted = w.count === antinukeTotal;
+        %>
+          <div class="person">
+            <div class="person-top">
+              <div class="avatar"><% if (w.avatarUrl) { %><img src="<%= w.avatarUrl %>" alt="" loading="lazy"><% } else { %><%= initial(w.displayName) %><% } %></div>
+              <div style="min-width:0;flex:1">
+                <div class="person-name"><%= w.displayName %> <% if (trusted) { %><span class="pill good">Trusted</span><% } %> <% if (w.bot) { %><span class="pill off">Bot</span><% } %></div>
+                <div class="person-handle">@<%= w.username %></div>
+                <div class="person-id"><span><%= w.id %></span><button type="button" onclick="copyText('<%= w.id %>', this)" title="Copy ID"><%- icon('copy', 13) %></button></div>
+              </div>
+            </div>
+            <div class="perm-bar">
+              <div class="t"><span><%= w.count %>/<%= antinukeTotal %> permissions</span><span style="color:<%= trusted ? 'var(--good)' : 'var(--warn)' %>"><%= w.pct %>%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:<%= w.pct %>%;background:<%= trusted ? 'var(--good)' : 'var(--warn)' %>"></div></div>
+            </div>
+            <div class="person-actions">
+              <button type="button" class="abtn" onclick="toggleChips('chips-<%= w.id %>')"><%- icon('eye', 14) %>View</button>
+              <button type="button" class="abtn" onclick='openWlModal(<%- JSON.stringify({ id: w.id, name: w.displayName, username: w.username, avatar: w.avatarUrl, edit: true }).replace(/</g, "\\u003c") %>)'><%- icon('pencil', 14) %>Edit</button>
+              <form action="/dashboard/<%= guildId %>/whitelist" method="POST" onsubmit="return confirm('Remove this user from the whitelist?')" style="display:inline">
+                <input type="hidden" name="actionType" value="remove"><input type="hidden" name="userId" value="<%= w.id %>">
+                <button type="submit" class="abtn danger"><%- icon('trash', 14) %>Remove</button>
+              </form>
+            </div>
+            <div id="chips-<%= w.id %>" style="display:none">
+              <div class="chip-lbl">Active bypass permissions</div>
+              <div class="chips">
+                <% w.perms.forEach(k => { %><span class="chip"><%- eventIcon(k, 12) %><%= (eventMeta.find(e => e.key === k) || {}).label ? eventMeta.find(e => e.key === k).label.replace(/^Anti /, '') : k %></span><% }) %>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- ===== COMMANDS ===== -->
+      <div class="glass panel">
+        <div class="panel-head"><h2><%- icon('book-open', 16, 'margin-right:7px;') %>Commands</h2></div>
+        <div class="cmd-note">
+          <code>/antinuke status</code> <code>/antinuke config</code> <code>/antinuke enableall</code> <code>/antinuke disableall</code><br>
+          <code>/whitelist add</code> <code>/whitelist remove</code> <code>/whitelist view</code> <code>/whitelist list</code> <code>/whitelist reset</code><br>
+          <code>/owner add</code> <code>/owner remove</code> <code>/owner list</code><br>
+          Prefix versions work too, e.g. <code>!whitelist add @user ban</code>
+        </div>
+        <% if (strictAccess) { %><p class="cmd-note" style="margin-top:8px">🔒 Strict mode is on: plain Administrators can't change Antinuke or the whitelist. Only the server owner and extra owners can.</p><% } %>
+      </div>
+
+      <!-- ===== WHITELIST PERMISSIONS MODAL ===== -->
+      <div class="modal-back" id="wlModal">
+        <form class="modal" action="/dashboard/<%= guildId %>/whitelist" method="POST">
+          <input type="hidden" name="actionType" value="add" id="wlAction">
+          <input type="hidden" name="userId" id="wlUserId">
+          <div class="modal-h">
+            <div class="plus"><%- icon('plus', 20) %></div>
+            <div><h3 id="wlTitle">Configure whitelist permissions</h3><p>Choose which anti-nuke actions this user can bypass</p></div>
+            <button type="button" class="modal-x" onclick="closeWl()" aria-label="Close"><%- icon('x', 20) %></button>
+          </div>
+          <div class="modal-user">
+            <div class="avatar" id="wlAvatar"></div>
+            <div style="min-width:0"><div class="person-name" id="wlName" style="font-size:14.5px"></div><div class="person-id" id="wlIdText" style="margin-top:2px"></div></div>
+          </div>
+          <div class="modal-sec"><span style="display:inline-flex;align-items:center;gap:7px"><%- icon('shield-check', 15) %>Bypass permissions</span>
+            <button type="button" class="mini-btn green" id="wlAllBtn">Enable all</button></div>
+          <div class="modal-list" id="wlList">
+            <% categoryOrder.forEach(cat => { %>
+              <div class="perm-cat"><%= cat %></div>
+              <% eventMeta.filter(e => e.category === cat).forEach(e => { %>
+                <label class="perm-row"><span style="display:inline-flex;align-items:center;gap:9px"><span style="color:var(--red2)"><%- eventIcon(e.key, 15) %></span><%= e.label %></span>
+                  <span class="switch"><input type="checkbox" name="perm" value="<%= e.key %>" class="wlperm"><span class="slider"></span></span>
+                </label>
+              <% }) %>
+            <% }) %>
+          </div>
+          <div class="modal-foot">
+            <button type="submit" class="save-btn" id="wlSubmit">Add to Whitelist</button>
+            <button type="button" class="cancel" onclick="closeWl()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+<%- include('partials/foot') %>
+<script type="application/json" id="wlData"><%- wlJson %></script>
+<script>
+(function () {
+  var GUILD = '<%= guildId %>';
+  var WL = JSON.parse(document.getElementById('wlData').textContent || '{}');
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  function avatarHtml(url, name) { return url ? '<img src="' + esc(url) + '" alt="">' : esc((name || '?').charAt(0).toUpperCase()); }
+
+  window.toggleChips = function (id) { var el = document.getElementById(id); el.style.display = el.style.display === 'none' ? 'block' : 'none'; };
+
+  /* ---------- whitelist modal ---------- */
+  var modal = document.getElementById('wlModal');
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.wlperm'));
+  var allBtn = document.getElementById('wlAllBtn');
+  function syncAllBtn() { allBtn.textContent = boxes.every(function (b) { return b.checked; }) ? 'Disable all' : 'Enable all'; }
+  allBtn.addEventListener('click', function () { var on = !boxes.every(function (b) { return b.checked; }); boxes.forEach(function (b) { b.checked = on; }); syncAllBtn(); });
+  boxes.forEach(function (b) { b.addEventListener('change', syncAllBtn); });
+
+  window.openWlModal = function (u) {
+    document.getElementById('wlUserId').value = u.id;
+    document.getElementById('wlAction').value = u.edit ? 'edit' : 'add';
+    document.getElementById('wlName').textContent = u.name;
+    document.getElementById('wlIdText').textContent = u.id;
+    document.getElementById('wlAvatar').innerHTML = avatarHtml(u.avatar, u.name);
+    document.getElementById('wlSubmit').textContent = u.edit ? 'Save changes' : 'Add to Whitelist';
+    var current = u.edit ? (WL[u.id] || []) : [];
+    boxes.forEach(function (b) { b.checked = current.indexOf(b.value) !== -1; });
+    syncAllBtn();
+    modal.classList.add('open');
+    document.getElementById('wlList').scrollTop = 0;
+  };
+  window.closeWl = function () { modal.classList.remove('open'); };
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeWl(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeWl(); });
+
+  /* ---------- member pickers ---------- */
+  function initPicker(root, onPick) {
+    if (!root) return;
+    var btn = root.querySelector('.picker-btn');
+    var input = root.querySelector('input');
+    var list = root.querySelector('.picker-list');
+    var bots = root.getAttribute('data-bots') === '1';
+    var timer = null, seq = 0;
+
+    function render(results) {
+      if (!results.length) { list.innerHTML = '<div class="picker-empty">No members found. Try a different name or paste a user ID.</div>'; return; }
+      list.innerHTML = results.map(function (r, i) {
+        return '<div class="pick" data-i="' + i + '"><div class="mini">' + avatarHtml(r.avatarUrl, r.displayName) + '</div>' +
+          '<div><div class="nm">' + esc(r.displayName) + (r.bot ? ' <span class="pill off">Bot</span>' : '') + '</div><div class="hd">@' + esc(r.username) + (r.inServer ? '' : ' · not in this server') + '</div></div></div>';
+      }).join('');
+      Array.prototype.forEach.call(list.querySelectorAll('.pick'), function (el) {
+        el.addEventListener('click', function () { var r = results[+el.getAttribute('data-i')]; root.classList.remove('open'); onPick({ id: r.id, name: r.displayName, username: r.username, avatar: r.avatarUrl, edit: false }); });
+      });
+    }
+    function search() {
+      var my = ++seq;
+      list.innerHTML = '<div class="picker-empty">Searching…</div>';
+      fetch('/dashboard/' + GUILD + '/antinuke/members?bots=' + (bots ? '1' : '0') + '&q=' + encodeURIComponent(input.value.trim()), { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { if (my === seq) render(d.results || []); })
+        .catch(function () { if (my === seq) list.innerHTML = '<div class="picker-empty">Search failed. Try again.</div>'; });
+    }
+    btn.addEventListener('click', function () { root.classList.toggle('open'); if (root.classList.contains('open')) { input.value = ''; search(); setTimeout(function () { input.focus(); }, 30); } });
+    input.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(search, 250); });
+    document.addEventListener('click', function (e) { if (!root.contains(e.target)) root.classList.remove('open'); });
+  }
+
+  initPicker(document.getElementById('wlPicker'), function (u) {
+    // already whitelisted? open it in edit mode instead of adding twice
+    if (WL[u.id]) u.edit = true;
+    openWlModal(u);
+  });
+  initPicker(document.getElementById('ownerPicker'), function (u) {
+    if (!confirm('Make ' + u.name + ' an extra owner?\n\nThey get full dashboard access and are never punished by Antinuke.')) return;
+    document.getElementById('ownerAddId').value = u.id;
+    document.getElementById('ownerAddForm').submit();
+  });
+})();
+</script>
+</body>
+</html>

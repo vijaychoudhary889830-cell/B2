@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<title>Checkout — SPIDEY Premium</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #08060a; --panel: #110d13; --field: #1a141c; --line: rgba(255,255,255,0.10);
+    --red: #ff3b4e; --red-soft: #ff8a96; --ok: #3ddc84; --text: #f5f1f3; --muted: #a79fa6;
+    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--text); font-family: var(--body); line-height: 1.5;
+    background: radial-gradient(900px 560px at 50% -10%, rgba(255,59,78,0.30), transparent 62%), var(--ink);
+    display: flex; flex-direction: column; align-items: center; padding: 18px 16px 40px;
+  }
+  :focus-visible { outline: 2px solid #8fd8ff; outline-offset: 2px; border-radius: 8px; }
+  .top { width: 100%; max-width: 440px; margin-bottom: 14px; }
+  .top a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .top a:hover { color: var(--text); }
+
+  .modal { width: 100%; max-width: 440px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+  .modal-head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+  .modal-head h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 19px; }
+  .secure { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .modal-body { padding: 20px 22px 22px; }
+
+  .plan { display: flex; gap: 14px; align-items: center; background: var(--field); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 18px; }
+  .plan img, .plan .ph { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: rgba(255,59,78,0.18); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--red-soft); }
+  .plan h2 { margin: 0; font-size: 15px; font-weight: 700; }
+  .plan p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+  .plan .price { margin-left: auto; text-align: right; font-family: var(--display); font-weight: 800; font-size: 20px; white-space: nowrap; }
+  .plan .price small { display: block; font-family: var(--body); font-weight: 500; font-size: 11.5px; color: var(--muted); }
+
+  .label { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .tab { appearance: none; cursor: pointer; font: inherit; color: var(--text); background: var(--field); border: 1px solid var(--line); border-radius: 12px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; transition: border-color .15s, background .15s; }
+  .tab svg { opacity: .9; }
+  .tab:hover { border-color: rgba(255,255,255,0.28); }
+  .tab[aria-selected="true"] { border-color: var(--red); background: rgba(255,59,78,0.14); }
+
+  .panel-note { font-size: 13.5px; color: var(--muted); margin: 0 0 16px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .field input { width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .field input::placeholder { color: #6c646b; }
+  .field input:focus { outline: none; border-color: var(--red); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+  .legal { font-size: 12px; color: var(--muted); margin: 4px 0 16px; }
+  .pay { width: 100%; cursor: pointer; font: inherit; font-weight: 800; font-size: 16px; padding: 14px; border: none; border-radius: 12px; background: var(--red); color: #1a0306; transition: background .15s, transform .15s; }
+  .pay:hover { background: #ff5566; }
+  .pay:active { transform: translateY(1px); }
+  .pay:disabled { opacity: .55; cursor: not-allowed; }
+  .msg { display: none; margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px; }
+  .msg.err { display: block; background: rgba(255,59,78,0.12); border: 1px solid rgba(255,59,78,0.4); color: #ffc2c8; }
+  .msg.ok { display: block; background: rgba(61,220,132,0.10); border: 1px solid rgba(61,220,132,0.4); color: #b8f3d1; }
+  .status { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); text-align: center; }
+  .status a { color: var(--red-soft); }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="top" style="display:flex;align-items:center;gap:12px;"><%- include('partials/home-btn') %><a href="/dashboard/<%= guildId %>/customize">← Back to dashboard</a></div>
+
+  <main class="modal">
+    <div class="modal-head">
+      <h1>Checkout</h1>
+      <span class="secure"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Secure</span>
+    </div>
+
+    <div class="modal-body">
+      <div class="plan">
+        <% if (guildIcon) { %><img src="<%= guildIcon %>" alt=""><% } else { %><div class="ph">★</div><% } %>
+        <div>
+          <h2>SPIDEY Premium for 1 server</h2>
+          <p><%= guildName %> · <span id="daysShown"><%= plans[initialPlan].lifetime ? 'Lifetime' : plans[initialPlan].label %></span></p>
+        </div>
+        <div class="price"><span id="priceShown">₹<%= plans[initialPlan].priceInr %></span><small>one-time</small></div>
+      </div>
+
+      <% if (premium) { %>
+        <div class="notice" style="font-size:13px;color:var(--muted);margin:-6px 0 16px;">Premium is already active until <b style="color:var(--text);"><%= new Date(premiumUntil).toLocaleDateString() %></b>. Paying again adds <span id="daysNote"><%= plans[initialPlan].lifetime ? 'lifetime access' : plans[initialPlan].label.toLowerCase() %></span>.</div>
+      <% } %>
+<% if (!payEnabled) { %>
+      <div class="msg err">Online payment isn't set up yet. You can <a href="<%= contactUrl %>" style="color:var(--red-soft);">get a Premium key</a> instead.</div>
+      <% } else { %>
+      <div class="field"><label>Plan</label>
+        <div id="planGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <% Object.values(plans).forEach(function (p) { %>
+          <button type="button" class="planBtn" data-plan="<%= p.key %>" style="padding:12px;border-radius:12px;border:1px solid <%= p.key === initialPlan ? 'var(--red-soft)' : 'rgba(255,255,255,.15)' %>;background:transparent;color:var(--text);font:inherit;cursor:pointer;text-align:left;"><b><%= p.label %></b><br><small style="color:var(--muted);"><%= p.lifetime ? 'Pay once, keep forever' : p.days + ' days' %></small></button>
+          <% }) %>
+        </div></div>
+      <div class="field"><label>Pay from</label>
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="curInr" class="cur on" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--red-soft);background:transparent;color:var(--text);font:inherit;cursor:pointer;">🇮🇳 India · <span id="curInrPrice">₹<%= plans[initialPlan].priceInr %></span><br><small style="color:var(--muted);">UPI, cards, netbanking</small></button>
+          <button type="button" id="curUsd" class="cur" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--text);font:inherit;cursor:pointer;">🌍 International · <span id="curUsdPrice">$<%= plans[initialPlan].priceUsd %></span><br><small style="color:var(--muted);">Foreign cards</small></button>
+        </div></div>
+      <p class="panel-note">Pay securely with a card or other methods on Cashfree's checkout. Your payment details never touch our servers.</p>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" inputmode="email"></div>
+      <div class="field"><label for="phone">Mobile number</label><input id="phone" type="tel" autocomplete="tel" placeholder="Include country code if outside India" inputmode="tel"><div class="hint">Needed by the payment provider for your receipt.</div></div>
+      <div class="field"><label for="name">Full name</label><input id="name" type="text" autocomplete="name" placeholder="Your name" value="<%= user && user.username ? user.username : '' %>"></div>
+      <p class="legal">Premium turns on for <b><%= guildName %></b> automatically, on the Discord account you're logged in with. This is a one-time payment, not a recurring subscription. By paying you agree to our <a href="/terms" target="_blank" style="color:var(--red-soft);">Terms</a> and <a href="/refund" target="_blank" style="color:var(--red-soft);">Refund Policy</a>.</p>
+      <button type="button" class="pay" id="pay">Pay ₹<%= plans[initialPlan].priceInr %></button>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+      <p class="status">Having trouble? <a href="/support">Contact support</a></p>
+      <% } %>
+</div>
+  </main>
+
+<% if (payEnabled) { %>
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script>
+(function () {
+  var guildId = <%- JSON.stringify(String(guildId)).replace(/</g, '\\u003c') %>;
+  var mode = <%- JSON.stringify(String(cfMode)) %>;
+  var msg = document.getElementById('msg');
+  var payBtn = document.getElementById('pay');
+  var currency = 'INR';
+  var plans = <%- JSON.stringify(plans).replace(/</g, '\\u003c') %>;
+  var plan = <%- JSON.stringify(initialPlan) %>;
+  var label = payBtn.textContent;
+  var bI = document.getElementById('curInr'), bU = document.getElementById('curUsd'), shown = document.getElementById('priceShown');
+  var planBtns = document.querySelectorAll('.planBtn');
+  function render() {
+    var p = plans[plan];
+    var inr = '\u20b9' + p.priceInr, usd = '$' + p.priceUsd;
+    var sym = currency === 'USD' ? usd : inr;
+    shown.textContent = sym; label = 'Pay ' + sym; payBtn.textContent = label;
+    document.getElementById('curInrPrice').textContent = inr;
+    document.getElementById('curUsdPrice').textContent = usd;
+    document.getElementById('daysShown').textContent = p.label;
+    var dn = document.getElementById('daysNote'); if (dn) dn.textContent = p.lifetime ? 'lifetime access' : p.label.toLowerCase();
+    bI.style.borderColor = currency === 'INR' ? 'var(--red-soft)' : 'rgba(255,255,255,.15)';
+    bU.style.borderColor = currency === 'USD' ? 'var(--red-soft)' : 'rgba(255,255,255,.15)';
+    planBtns.forEach(function (b) { b.style.borderColor = b.dataset.plan === plan ? 'var(--red-soft)' : 'rgba(255,255,255,.15)'; });
+  }
+  function setCur(c) { currency = c; render(); }
+  bI.addEventListener('click', function () { setCur('INR'); });
+  bU.addEventListener('click', function () { setCur('USD'); });
+  planBtns.forEach(function (b) { b.addEventListener('click', function () { plan = b.dataset.plan; render(); }); });
+  render();
+  function show(text, kind) { msg.textContent = text; msg.className = 'msg ' + kind; }
+  function reset() { payBtn.disabled = false; payBtn.textContent = label; }
+
+  payBtn.addEventListener('click', function () {
+    msg.className = 'msg'; msg.textContent = '';
+    var email = document.getElementById('email').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var name = document.getElementById('name').value.trim();
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show('Please enter a valid email address.', 'err');
+    if (phone.replace(/\D/g, '').length < 7) return show('Please enter your mobile number.', 'err');
+    if (typeof Cashfree === 'undefined') return show('The payment window could not load. Please refresh and try again.', 'err');
+
+    payBtn.disabled = true; payBtn.textContent = 'Starting payment…';
+    fetch('/dashboard/' + guildId + '/premium/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, phone: phone, name: name, currency: currency, plan: plan }) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Could not start the payment.'); return j; }); })
+      .then(function (o) {
+        var cashfree = Cashfree({ mode: o.mode || mode });
+        return cashfree.checkout({ paymentSessionId: o.paymentSessionId, redirectTarget: '_self' });
+      })
+      .catch(function (e) { reset(); show(e.message, 'err'); });
+  });
+})();
+</script>
+<% } %>
+
+</body>
+</html>

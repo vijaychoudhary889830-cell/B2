@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcomer — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'welcomer' }) %>
+<%- include('partials/topbar', { pageLabel: 'Welcomer' }) %>
+
+      <form action="/dashboard/<%= guildId %>/welcomer" method="POST">
+        <div class="glass panel">
+          <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>Welcomer</h2></div>
+          <div class="toggle-row" style="border-top:none;padding-top:0;">
+            <div><div class="toggle-label">Enabled</div><div class="toggle-hint">Post your own greeting when someone joins. Nothing is sent until you write a message below.</div></div>
+            <label class="switch"><input type="checkbox" name="enabled" <%= welcomer.enabled ? 'checked' : '' %>><span class="slider"></span></label>
+          </div>
+          <label class="lbl-sm">Channel</label>
+          <select name="channelId">
+            <option value="">— Select a channel —</option>
+            <% guildTextChannels.forEach(c => { %>
+              <option value="<%= c.id %>" <%= welcomer.channelId === c.id ? 'selected' : '' %>>#<%= c.name %></option>
+            <% }) %>
+          </select>
+          <label class="lbl-sm">Title <span style="font-weight:400;">(use {user}, {server}, {count})</span></label>
+          <input type="text" name="title" value="<%= welcomer.title %>" placeholder="Welcome {user} to {server}">
+          <label class="lbl-sm">Message</label>
+          <textarea name="description" data-md placeholder="Write your welcome message here. You can use {user}, {server} and {count}."><%= welcomer.description %></textarea>
+          <p class="md-hint">Use the buttons for bold, italic, links and more. Your preview is below.</p>
+          <div class="row2">
+            <div><label class="lbl-sm">Banner Image URL</label><input type="text" name="bannerUrl" value="<%= welcomer.bannerUrl %>" placeholder="https://..."></div>
+            <div><label class="lbl-sm">Embed Color</label><input type="color" name="color" value="<%= welcomer.color %>"></div>
+          </div>
+          <label class="lbl-sm">Footer Text</label>
+          <input type="text" name="footerText" value="<%= welcomer.footerText %>" placeholder="You are member #{count}">
+
+          <div class="embed-preview" data-label="Live preview" data-title-field="title" data-desc-field="description" data-footer-field="footerText" data-image-field="bannerUrl" data-color-field="color" data-ping="1" data-thumb="1"></div>
+
+          <button type="submit" class="save-btn">Save Welcomer</button>
+        </div>
+      </form>
+
+<%- include('partials/editor') %>
+<%- include('partials/foot') %>
+</body>
+</html>

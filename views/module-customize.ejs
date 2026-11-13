@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bot Profile — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+<style>
+  .pv-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); background: var(--card2); }
+  .pv-banner { width: 100%; max-width: 360px; aspect-ratio: 2.5 / 1; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); background: var(--card2); display: none; }
+  .pv-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ghost-btn { padding: 8px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .lock-box { text-align: center; padding: 8px 4px; }
+  .lock-box .big { font-size: 34px; }
+  #cust-msg { margin-top: 12px; font-size: 13px; font-weight: 700; }
+  input[type=file] { color: var(--muted); font-size: 12.5px; max-width: 100%; }
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'customize' }) %>
+<%- include('partials/topbar', { pageLabel: 'Bot Profile' }) %>
+
+      <!-- Prefix (free for everyone) -->
+      <form action="/dashboard/<%= guildId %>/prefix" method="POST">
+        <div class="glass panel">
+          <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>Prefix</h2></div>
+          <p class="cmd-note" style="margin-top:-8px;">Members can use commands like <code><%= prefix %>play</code> and <code><%= prefix %>help</code>. Slash commands always work too.</p>
+          <input type="text" name="prefix" value="<%= prefix %>" maxlength="5" required>
+          <button type="submit" class="save-btn">Save Prefix</button>
+        </div>
+      </form>
+
+      <% if (!premium) { %>
+      <div class="glass panel">
+        <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>Bot Profile — Premium</h2></div>
+        <div class="lock-box">
+          <div class="big"><svg class="i" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <p class="cmd-note">Give the bot its own <b>name, avatar, banner and bio</b> in this server.<br>This is a Premium feature.</p>
+          <% if (payEnabled) { %>
+          <form action="/dashboard/<%= guildId %>/checkout" method="GET" style="margin:14px 0 4px;">
+            <button type="submit" class="save-btn"><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>Buy Premium — ₹<%= priceInr %> / $<%= priceUsd %> · <%= premiumDays %> days</button>
+          </form>
+          <p class="cmd-note">Pay securely online with Cashfree. Premium turns on for <b><%= guildName %></b> automatically, on the Discord account you're logged in with.</p>
+          <% } else { %>
+          <p class="cmd-note"><a href="<%= contactUrl %>" target="_blank" rel="noopener noreferrer" style="color:var(--accent2);font-weight:700;">Get a Premium key →</a></p>
+          <% } %>
+        </div>
+        <form action="/dashboard/<%= guildId %>/premium/redeem" method="POST">
+          <label class="lbl-sm">Have a key? Redeem it here</label>
+          <input type="text" name="key" placeholder="SPDY-XXXX-XXXX-XXXX" required>
+          <button type="submit" class="save-btn">Redeem Key</button>
+        </form>
+      </div>
+      <% } else { %>
+      <div class="glass panel">
+        <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>Bot Profile</h2></div>
+        <p class="cmd-note" style="margin-top:-8px;"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:5px;flex-shrink:0;"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>Premium until <b><%= new Date(premiumUntil).toLocaleDateString() %></b>. Changes only affect <b>this server</b>.</p>
+
+        <label class="lbl-sm">Bot name (nickname in this server)</label>
+        <input type="text" id="c-nick" value="<%= currentNick %>" maxlength="32" placeholder="Leave empty for the default name">
+
+        <label class="lbl-sm">Bio (max 190 characters)</label>
+        <textarea id="c-bio" maxlength="190" placeholder="Shown on the bot's profile in this server"></textarea>
+
+        <label class="lbl-sm">Avatar (square image; PNG, JPG, WEBP or GIF under 2 MB)</label>
+        <div class="pv-row">
+          <img class="pv-avatar" id="pv-avatar" src="<%= currentAvatarUrl %>" alt="">
+          <input type="file" id="f-avatar" accept="image/png,image/jpeg,image/webp,image/gif">
+          <button type="button" class="ghost-btn" onclick="markReset('avatar')">Reset avatar</button>
+        </div>
+
+        <label class="lbl-sm">Banner (wide image; large photos are cropped and resized for you)</label>
+        <div class="pv-row" style="margin-bottom:6px;">
+          <input type="file" id="f-banner" accept="image/png,image/jpeg,image/webp,image/gif">
+          <button type="button" class="ghost-btn" onclick="markReset('banner')">Reset banner</button>
+        </div>
+        <img class="pv-banner" id="pv-banner" alt="">
+
+        <button type="button" class="save-btn" id="cust-save" onclick="saveProfile()">Save Bot Profile</button>
+        <div id="cust-msg"></div>
+        <p class="cmd-note" style="margin-top:12px;">The bot needs the <b>Change Nickname</b> permission for the name to update. Discord limits how often profile images can be changed, so wait a bit between changes.</p>
+      </div>
+
+      <script>
+        const state = { avatar: undefined, banner: undefined }; // undefined = unchanged, null = reset, string = new image
+
+        function loadImage(url) {
+          return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('Could not read that image')); i.src = url; });
+        }
+        function readAsDataUrl(file) {
+          return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(new Error('Could not read that file')); r.readAsDataURL(file); });
+        }
+        async function prepare(file, w, h) {
+          if (file.type === 'image/gif') {
+            if (file.size > 2 * 1024 * 1024) throw new Error('GIFs must be under 2 MB');
+            return readAsDataUrl(file);
+          }
+          const img = await loadImage(URL.createObjectURL(file));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const scale = Math.max(w / img.width, h / img.height);          // cover-crop
+          const dw = img.width * scale, dh = img.height * scale;
+          canvas.getContext('2d').drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+          return canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.9);
+        }
+
+        document.getElementById('f-avatar').addEventListener('change', async (e) => {
+          const f = e.target.files[0]; if (!f) return;
+          try { state.avatar = await prepare(f, 512, 512); document.getElementById('pv-avatar').src = state.avatar; setMsg('', ''); }
+          catch (err) { setMsg(err.message, 'err'); }
+        });
+        document.getElementById('f-banner').addEventListener('change', async (e) => {
+          const f = e.target.files[0]; if (!f) return;
+          try { state.banner = await prepare(f, 1200, 480); const p = document.getElementById('pv-banner'); p.src = state.banner; p.style.display = 'block'; setMsg('', ''); }
+          catch (err) { setMsg(err.message, 'err'); }
+        });
+
+        function markReset(kind) {
+          state[kind] = null;
+          setMsg(kind === 'avatar' ? 'Avatar will be reset when you save.' : 'Banner will be reset when you save.', 'ok');
+        }
+        function setMsg(text, kind) {
+          const el = document.getElementById('cust-msg');
+          el.textContent = text;
+          el.style.color = kind === 'err' ? '#ff7b7b' : kind === 'ok' ? '#5ee6a0' : 'inherit';
+        }
+
+        async function saveProfile() {
+          const btn = document.getElementById('cust-save');
+          const body = { nick: document.getElementById('c-nick').value, bio: document.getElementById('c-bio').value };
+          if (state.avatar !== undefined) body.avatar = state.avatar;
+          if (state.banner !== undefined) body.banner = state.banner;
+          btn.disabled = true; setMsg('Saving…', '');
+          try {
+            const res = await fetch('/dashboard/<%= guildId %>/customize', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || 'Something went wrong');
+            state.avatar = undefined; state.banner = undefined;
+            setMsg('✅ Saved! It can take a few seconds to show in Discord.', 'ok');
+          } catch (err) { setMsg('⚠️ ' + err.message, 'err'); }
+          btn.disabled = false;
+        }
+      </script>
+      <% } %>
+
+<%- include('partials/foot') %>
+</body>
+</html>

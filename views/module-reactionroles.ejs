@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaction Roles — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'reactionroles' }) %>
+<%- include('partials/topbar', { pageLabel: 'Reaction Roles' }) %>
+
+      <div class="glass panel">
+        <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>Reaction Roles</h2></div>
+
+        <% if (reactionRoleMessages.length === 0) { %>
+          <p class="list-empty">No reaction-role panels yet — create one below.</p>
+        <% } else { %>
+          <% reactionRoleMessages.forEach(m => { %>
+            <% m.links.forEach(link => { %>
+              <div class="list-row">
+                <span><%= link.emojiKey %> → <%= link.roleName %> <span style="color:var(--muted);font-size:11px;">(msg <%= m.messageId %>)</span></span>
+                <form action="/dashboard/<%= guildId %>/reactionroles/delete" method="POST" style="display:inline">
+                  <input type="hidden" name="messageId" value="<%= m.messageId %>">
+                  <input type="hidden" name="emojiKey" value="<%= link.emojiKey %>">
+                  <button type="submit" class="mini-btn">Remove</button>
+                </form>
+              </div>
+            <% }) %>
+          <% }) %>
+        <% } %>
+
+        <p class="cmd-note" style="margin-top:14px;">Create a new panel (posts a real message + reacts automatically):</p>
+        <form action="/dashboard/<%= guildId %>/reactionroles" method="POST">
+          <label class="lbl-sm">Channel</label>
+          <select name="channelId">
+            <option value="">— Select a channel —</option>
+            <% guildTextChannels.forEach(c => { %><option value="<%= c.id %>">#<%= c.name %></option><% }) %>
+          </select>
+          <label class="lbl-sm">Panel Title</label>
+          <input type="text" name="title" value="Self Roles">
+          <label class="lbl-sm">Panel Description</label>
+          <textarea name="description">React below to get a role!</textarea>
+          <% for (let i = 1; i <= 3; i++) { %>
+            <label class="lbl-sm">Pair <%= i %> — Emoji + Role</label>
+            <div class="row2">
+              <input type="text" name="emoji<%= i %>" placeholder="e.g. 🎮 or <a:name:id>">
+              <select name="role<%= i %>">
+                <option value="">— No role —</option>
+                <% guildRoles.forEach(r => { %><option value="<%= r.id %>">@<%= r.name %></option><% }) %>
+              </select>
+            </div>
+          <% } %>
+          <button type="submit" class="save-btn">Create Panel</button>
+        </form>
+      </div>
+
+<%- include('partials/foot') %>
+</body>
+</html>

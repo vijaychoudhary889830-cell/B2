@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autorole — <%= guildName %></title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<%- include('partials/styles') %>
+</head>
+<body>
+<%- include('partials/sidebar', { activeModule: 'autorole' }) %>
+<%- include('partials/topbar', { pageLabel: 'Autorole' }) %>
+
+      <form action="/dashboard/<%= guildId %>/autorole" method="POST">
+        <div class="glass panel">
+          <div class="panel-head"><h2><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>Autorole</h2></div>
+          <p class="cmd-note" style="margin-top:-8px;">Automatically given to every member who joins.</p>
+          <select name="roleId">
+            <option value="">— None —</option>
+            <% guildRoles.forEach(r => { %><option value="<%= r.id %>" <%= autoRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option><% }) %>
+          </select>
+          <button type="submit" class="save-btn">Save Autorole</button>
+        </div>
+      </form>
+
+<%- include('partials/foot') %>
+</body>
+</html>

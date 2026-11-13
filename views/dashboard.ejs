@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select a Server — SPIDEY</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#08060a; --panel:#130f16; --line:rgba(255,255,255,0.09); --red:#ff3b4e; --ice:#8fd8ff; --text:#f5f1f3; --muted:#a79fa6;
+    --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif; --body:'DM Sans','Segoe UI',system-ui,sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin:0; color:var(--text); font-family:var(--body); min-height:100vh;
+    background: radial-gradient(900px 480px at 8% -8%, rgba(255,59,78,0.18), transparent 60%), var(--ink); }
+  :focus-visible { outline:2px solid var(--ice); outline-offset:3px; border-radius:8px; }
+  nav { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; max-width:1120px; margin:0 auto; }
+  .brand { display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:800; font-size:19px; text-decoration:none; color:var(--text); }
+  .brand-logo { width:32px; height:32px; border-radius:9px; object-fit:cover; border:1px solid var(--line); }
+  nav a.out { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; }
+  nav a.out:hover { color:var(--text); }
+  .nav-right { display:flex; align-items:center; gap:18px; }
+  nav a.home { display:inline-flex; align-items:center; gap:7px; padding:8px 14px; border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--text); text-decoration:none; font-size:14px; font-weight:700; transition:border-color .15s; }
+  nav a.home:hover { border-color:rgba(255,59,78,0.6); }
+  a.back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; margin-bottom:18px; }
+  a.back:hover { color:var(--text); }
+  .wrap { max-width:1120px; margin:0 auto; padding:36px 24px 60px; }
+  h1 { font-family:var(--display); font-size:clamp(28px,4vw,38px); letter-spacing:-0.015em; margin:0 0 8px; }
+  .sub { color:var(--muted); margin:0 0 32px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 20px; text-align:center; transition:border-color .15s; }
+  .card:hover { border-color:rgba(255,59,78,0.5); }
+  .avatar { width:64px; height:64px; border-radius:18px; margin:0 auto 14px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-weight:800; font-size:22px; color:#1a0306; background:var(--red); object-fit:cover; }
+  .gname { font-weight:700; font-size:15px; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gmeta { color:var(--muted); font-size:13px; margin-bottom:18px; }
+  .btn { display:block; padding:10px 0; border-radius:10px; font-weight:700; font-size:14px; text-decoration:none; border:1px solid transparent; }
+  .btn-primary { background:var(--red); color:#1a0306; }
+  .btn-primary:hover { background:#ff5566; }
+  .btn-invite { border-color:var(--line); color:var(--text); background:rgba(255,255,255,0.03); }
+  .btn-invite:hover { border-color:rgba(255,255,255,0.3); }
+  .empty { text-align:center; color:var(--muted); padding:60px 20px; border:1px dashed var(--line); border-radius:16px; }
+</style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt="SPIDEY"> SPIDEY</a>
+    <div class="nav-right">
+      <%- include('partials/home-btn') %>
+      <a class="out" href="/logout">Log out</a>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <h1>Choose a server</h1>
+    <p class="sub">Showing servers where you have admin permission.</p>
+
+    <% if (guilds.length === 0) { %>
+      <div class="empty">No servers found where you have admin permissions. Log out and back in if this looks wrong.</div>
+    <% } else { %>
+      <div class="grid">
+        <% guilds.forEach(guild => { %>
+          <div class="card">
+            <% if (guild.iconUrl) { %>
+              <img class="avatar" src="<%= guild.iconUrl %>" alt="">
+            <% } else { %>
+              <div class="avatar"><%= guild.name.slice(0,2).toUpperCase() %></div>
+            <% } %>
+            <div class="gname"><%= guild.name %></div>
+            <div class="gmeta"><% if (guild.botInServer && guild.memberCount) { %><%= guild.memberCount %> members<% } else { %>Bot not in server<% } %></div>
+            <% if (guild.botInServer) { %>
+              <a href="/dashboard/<%= guild.id %>" class="btn btn-primary">Configure</a>
+            <% } else { %>
+              <a href="https://discord.com/oauth2/authorize?client_id=<%= clientId %>&scope=bot&permissions=8&guild_id=<%= guild.id %>" target="_blank" class="btn btn-invite">Invite Bot</a>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

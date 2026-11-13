@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= guildName %> — Sentinel</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #000000; --bg2: #0a0a0a;
+    --card: #ffffff; --border: #e2e8f0;
+    --text: #1b2733; --muted: #64758a; --page-text: #f4f6fa;
+    --accent: #38a3ff; --accent2: #8fd8ff; --ice: #b9e6ff;
+    --good: #16a34a; --warn: #f59e0b; --danger: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--page-text); font-family: 'Segoe UI', system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 8% -10%, #141414 0%, transparent 40%),
+      radial-gradient(circle at 100% 0%, #0d1f33 0%, transparent 45%),
+      linear-gradient(180deg, var(--bg), var(--bg2));
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 240px; flex-shrink: 0; border-right: 1px solid var(--border);
+    padding: 18px 12px; display: flex; flex-direction: column; gap: 2px;
+    background: #fbfdff; backdrop-filter: blur(14px); color: var(--text);
+    position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 50;
+    transform: translateX(-100%); transition: transform .22s ease;
+    box-shadow: 0 0 30px rgba(0,0,0,0.15);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-close { display: block; align-self: flex-end; background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer; margin-bottom: 6px; }
+  .drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(10,30,60,0.35); z-index: 45; }
+  .drawer-overlay.open { display: block; }
+
+  @media (min-width: 901px) {
+    .sidebar { position: sticky; transform: none; box-shadow: none; background: #ffffff; }
+    .sidebar-close { display: none; }
+    .drawer-overlay { display: none !important; }
+    .menu-btn { display: none !important; }
+  }
+
+  .sidebar-foot { margin-top: auto; padding: 10px; }
+  .sidebar-foot a { color: var(--muted); font-size: 12.5px; text-decoration: none; }
+
+  .main { flex: 1; padding: 24px 20px 60px; max-width: 900px; width: 100%; }
+  @media (min-width: 700px) { .main { padding: 24px 34px 60px; } }
+
+  .menu-btn {
+    width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border);
+    background: #fff; font-size: 17px; cursor: pointer; flex-shrink: 0;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 15px; padding: 4px 10px 18px; }
+  .brand-badge {
+    width: 27px; height: 27px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    box-shadow: 0 4px 14px rgba(56,163,255,0.4), inset 0 1px 0 rgba(255,255,255,0.7);
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .side-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 12px 12px 6px; font-weight: 700; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px;
+    color: var(--muted); font-size: 13px; font-weight: 600; text-decoration: none;
+    border-left: 3px solid transparent;
+  }
+  .nav-item .ic {
+    width: 22px; height: 22px; border-radius: 6px; background: #e7f1fb;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;
+  }
+  .nav-item:hover { background: rgba(56,163,255,0.08); color: var(--text); }
+  .sidebar-foot { margin-top: auto; padding: 10px; }
+  .sidebar-foot a { color: var(--muted); font-size: 12.5px; text-decoration: none; }
+
+  .main { flex: 1; padding: 24px 34px 60px; max-width: 900px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 14px; }
+  .crumbs { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+  .welcome { font-size: 20px; font-weight: 800; margin: 0; }
+  .btn-row { display: flex; gap: 8px; }
+  .glossy-btn, .ghost-btn {
+    padding: 9px 16px; border-radius: 9px; font-weight: 700; font-size: 12.5px; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: none;
+  }
+  .glossy-btn {
+    background: linear-gradient(180deg, var(--accent2), var(--accent)); color: #06283f;
+    box-shadow: 0 6px 16px rgba(56,163,255,0.35), inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .ghost-btn { background: #fff; color: var(--text); border: 1px solid var(--border); }
+
+  .banner {
+    background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.3); color: #0f7a37;
+    padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-bottom: 18px;
+  }
+  .banner.error { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #b91c1c; }
+
+  .glass {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; color: var(--text);
+    backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(120,160,200,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  .hero { padding: 22px 24px; margin-bottom: 18px; background: linear-gradient(135deg, #eaf6ff, #cdeaff); border: 1px solid var(--ice); }
+  .hero .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #1483d6; text-transform: uppercase; }
+  .hero h1 { font-size: 24px; margin: 6px 0 6px; }
+  .hero p { margin: 0; color: #3c556c; font-size: 13.5px; line-height: 1.5; }
+
+  .panel { padding: 20px; margin-bottom: 16px; scroll-margin-top: 16px; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .panel-head h2 { font-size: 15px; margin: 0; }
+
+  .field-row { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid var(--border); border-radius: 11px; padding: 11px 14px; margin-bottom: 10px; }
+  .field-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+  .field-value { font-size: 14.5px; font-weight: 700; }
+  .copy-btn { background: #eef5fc; border: 1px solid var(--border); border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 13px; flex-shrink: 0; }
+
+  .stat2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+  .stat-box { background: #fff; border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px; }
+  .stat-box .lbl { color: var(--muted); font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .stat-box .val { font-size: 17px; font-weight: 800; margin-top: 3px; }
+
+  .bar-row { padding: 12px 0; border-top: 1px solid var(--border); }
+  .bar-row:first-of-type { border-top: none; padding-top: 2px; }
+  .bar-top { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+  .bar-track { height: 6px; border-radius: 999px; background: #e6edf5; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--border); gap: 12px; }
+  .toggle-row:first-of-type { border-top: none; }
+  .toggle-label { font-size: 13.5px; font-weight: 700; }
+  .toggle-hint { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+
+  .switch { position: relative; width: 40px; height: 23px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #d7e3f0; border-radius: 999px; cursor: pointer; transition: .15s; }
+  .slider:before { content: ""; position: absolute; width: 17px; height: 17px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .15s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  input:checked + .slider { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+  input:checked + .slider:before { transform: translateX(17px); }
+
+  .save-btn, .danger-btn {
+    border: none; padding: 10px 22px; border-radius: 9px; font-weight: 800; font-size: 13px; cursor: pointer; margin-top: 10px;
+  }
+  .save-btn { background: linear-gradient(180deg, var(--accent2), var(--accent)); color: #06283f; box-shadow: 0 6px 16px rgba(56,163,255,0.35), inset 0 1px 0 rgba(255,255,255,0.7); }
+  .danger-btn { background: #fff; color: var(--danger); border: 1px solid #fbd5d5; }
+  .mini-btn { background: #fff; border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; color: var(--danger); }
+
+  .cmd-note { color: var(--muted); font-size: 12px; line-height: 1.8; }
+  .cmd-note code { background: #eef5fc; padding: 2px 6px; border-radius: 5px; color: #1483d6; }
+
+  .chart-wrap { position: relative; height: 190px; }
+
+  label.lbl-sm { font-size: 11.5px; font-weight: 700; color: var(--muted); display: block; margin: 10px 0 5px; }
+  input[type=text], input[type=color], select, textarea {
+    width: 100%; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--border);
+    background: #fff; color: var(--text); font-size: 13.5px; font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 640px) { .row2, .stat2x2 { grid-template-columns: 1fr; } }
+
+  .event-cat { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--accent); margin: 16px 0 6px; }
+  .event-cat:first-child { margin-top: 0; }
+  .event-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .event-row:first-of-type { border-top: none; }
+  .event-row .name { flex: 1; font-size: 13px; font-weight: 600; }
+  .event-row select { width: 90px; padding: 5px 8px; font-size: 12px; flex-shrink: 0; }
+
+  .list-row { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; margin-bottom: 8px; font-size: 13px; }
+  .list-empty { color: var(--muted); font-size: 12.5px; padding: 10px 2px; }
+</style>
+</head>
+<body>
+  <div class="drawer-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <button class="sidebar-close" onclick="toggleSidebar(false)">✕</button>
+      <div class="brand"><div class="brand-badge">❄️</div> Sentinel</div>
+      <a href="/dashboard" class="nav-item"><span class="ic">🏠</span> All Servers</a>
+
+      <div class="side-label">Modules</div>
+      <a href="#overview" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">📊</span> Overview</a>
+      <a href="#automod" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">🧹</span> AutoMod</a>
+      <a href="#antinuke" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">🛡️</span> Antinuke</a>
+      <a href="#welcomer" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">😊</span> Welcomer</a>
+      <a href="#reactionroles" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">🎭</span> Reaction Roles</a>
+      <a href="#whitelist" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">✅</span> Whitelist</a>
+      <a href="#autorole" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">👤</span> Autorole</a>
+      <a href="#logging" class="nav-item" onclick="toggleSidebar(false)"><span class="ic">📜</span> Logging</a>
+
+      <div class="sidebar-foot"><a href="/logout">Log Out</a></div>
+    </div>
+
+    <div class="main">
+      <div class="topbar" id="overview">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <%- include('partials/home-btn') %>
+          <button class="menu-btn" onclick="toggleSidebar(true)">☰</button>
+          <div>
+            <div class="crumbs">Home &nbsp;›&nbsp; Server Settings</div>
+            <p class="welcome">Welcome, <%= username %>!</p>
+          </div>
+        </div>
+        <div class="btn-row">
+          <a href="https://discord.com/channels/<%= guildId %>/audit-log" target="_blank" class="ghost-btn">👁️ Audit Logs</a>
+          <button type="button" class="glossy-btn" onclick="location.reload()">🔄 Sync</button>
+        </div>
+      </div>
+
+      <% if (saved) { %><div class="banner">✅ Settings saved.</div><% } %>
+      <% if (error) { %><div class="banner error">⚠️ <%= error %></div><% } %>
+      <% if (!botInGuild) { %><div class="banner error">⚠️ The bot isn't in this server right now — live stats and role/channel dropdowns won't be available.</div><% } %>
+
+      <div class="glass hero">
+        <div class="eyebrow">Overview</div>
+        <h1><%= guildName %></h1>
+        <p>Real-time server protection posture with module-level security readiness.</p>
+      </div>
+
+      <div class="glass panel">
+        <div class="panel-head"><h2>Server Details</h2></div>
+        <div class="field-row">
+          <div><div class="field-label">Server Name</div><div class="field-value"><%= guildName %></div></div>
+          <button class="copy-btn" onclick="copyText('<%= guildName %>', this)">📋</button>
+        </div>
+        <div class="field-row">
+          <div><div class="field-label">Server ID</div><div class="field-value"><%= guildId %></div></div>
+          <button class="copy-btn" onclick="copyText('<%= guildId %>', this)">📋</button>
+        </div>
+        <div class="stat2x2">
+          <div class="stat-box"><div class="lbl">📶 Type</div><div class="val"><%= sizeTier %></div></div>
+          <div class="stat-box"><div class="lbl">👥 Members</div><div class="val"><%= memberCount ?? '—' %></div></div>
+          <div class="stat-box"><div class="lbl"># Channels</div><div class="val"><%= channelCount ?? '—' %></div></div>
+          <div class="stat-box"><div class="lbl">🎚️ Roles</div><div class="val"><%= roleCount ?? '—' %></div></div>
+        </div>
+      </div>
+
+      <div class="glass panel">
+        <div class="panel-head"><h2>Protection Readiness</h2></div>
+        <% const antinukePct = antinukeTotal ? Math.round((antinukeEnabled / antinukeTotal) * 100) : 0; %>
+        <% const automodPct = automodTotalCount ? Math.round((automodOnCount / automodTotalCount) * 100) : 0; %>
+        <% const whitelistPct = whitelistCount > 0 ? 100 : 0; %>
+        <div class="bar-row"><div class="bar-top"><span>Nuke Protection</span><span style="color:var(--warn)"><%= antinukePct %>%</span></div><div class="bar-track"><div class="bar-fill" style="width:<%= antinukePct %>%;background:var(--warn)"></div></div></div>
+        <div class="bar-row"><div class="bar-top"><span>AutoMod</span><span style="color:var(--accent)"><%= automodPct %>%</span></div><div class="bar-track"><div class="bar-fill" style="width:<%= automodPct %>%;background:var(--accent)"></div></div></div>
+        <div class="bar-row"><div class="bar-top"><span>Whitelist Configured</span><span style="color:var(--good)"><%= whitelistPct %>%</span></div><div class="bar-track"><div class="bar-fill" style="width:<%= whitelistPct %>%;background:var(--good)"></div></div></div>
+      </div>
+
+      <div class="glass panel">
+        <div class="panel-head"><h2>Anti-Nuke Coverage by Category</h2></div>
+        <p class="cmd-note" style="margin:-8px 0 14px;">Live from your protection config below.</p>
+        <div class="chart-wrap"><canvas id="antinukeChart"></canvas></div>
+      </div>
+
+      <!-- AutoMod -->
+      <form action="/dashboard/<%= guildId %>" method="POST">
+        <div class="glass panel" id="automod">
+          <div class="panel-head"><h2>🧹 AutoMod</h2></div>
+          <p class="cmd-note" style="margin-top:-8px;">Word list, thresholds, and punishment type are set via <code>/automod</code>.</p>
+          <div class="toggle-row"><div><div class="toggle-label">Spam Filter</div><div class="toggle-hint">Deletes/timeouts users sending messages too fast</div></div><label class="switch"><input type="checkbox" name="spamEnabled" <%= automodSettings.spamEnabled ? 'checked' : '' %>><span class="slider"></span></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Word Filter</div><div class="toggle-hint">Blocks banned words (manage list with /automod word)</div></div><label class="switch"><input type="checkbox" name="wordFilterEnabled" <%= automodSettings.wordFilterEnabled ? 'checked' : '' %>><span class="slider"></span></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Caps Filter</div><div class="toggle-hint">Flags messages that are excessively uppercase</div></div><label class="switch"><input type="checkbox" name="capsEnabled" <%= automodSettings.capsEnabled ? 'checked' : '' %>><span class="slider"></span></label></div>
+          <button type="submit" class="save-btn">Save Changes</button>
+        </div>
+      </form>
+
+      <!-- Antinuke -->
+      <div class="glass panel" id="antinuke">
+        <div class="panel-head">
+          <h2>🛡️ Antinuke — <%= antinukeEnabled %>/<%= antinukeTotal %> enabled</h2>
+          <div class="btn-row">
+            <form action="/dashboard/<%= guildId %>/antinuke/all" method="POST" style="display:inline"><input type="hidden" name="bulk" value="enable"><button class="mini-btn" style="color:var(--good)" type="submit">Enable All</button></form>
+            <form action="/dashboard/<%= guildId %>/antinuke/all" method="POST" style="display:inline"><input type="hidden" name="bulk" value="disable"><button class="mini-btn" type="submit">Disable All</button></form>
+          </div>
+        </div>
+        <form action="/dashboard/<%= guildId %>/antinuke" method="POST">
+          <% antinukeByCategory.forEach(cat => { %>
+            <div class="event-cat"><%= cat.category %></div>
+            <% cat.events.forEach(ev => { %>
+              <div class="event-row">
+                <label class="switch"><input type="checkbox" name="enabled_<%= ev.key %>" <%= ev.enabled ? 'checked' : '' %>><span class="slider"></span></label>
+                <div class="name"><%= ev.label %></div>
+                <select name="action_<%= ev.key %>">
+                  <option value="ban" <%= ev.action === 'ban' ? 'selected' : '' %>>Ban</option>
+                  <option value="kick" <%= ev.action === 'kick' ? 'selected' : '' %>>Kick</option>
+                </select>
+              </div>
+            <% }) %>
+          <% }) %>
+          <button type="submit" class="save-btn">Save Antinuke Config</button>
+        </form>
+      </div>
+
+      <!-- Welcomer -->
+      <form action="/dashboard/<%= guildId %>/welcomer" method="POST">
+        <div class="glass panel" id="welcomer">
+          <div class="panel-head"><h2>😊 Welcomer</h2></div>
+          <div class="toggle-row" style="border-top:none;padding-top:0;">
+            <div><div class="toggle-label">Enabled</div><div class="toggle-hint">Post a greeting embed when someone joins</div></div>
+            <label class="switch"><input type="checkbox" name="enabled" <%= welcomer.enabled ? 'checked' : '' %>><span class="slider"></span></label>
+          </div>
+          <label class="lbl-sm">Channel</label>
+          <select name="channelId">
+            <option value="">— Select a channel —</option>
+            <% guildTextChannels.forEach(c => { %>
+              <option value="<%= c.id %>" <%= welcomer.channelId === c.id ? 'selected' : '' %>>#<%= c.name %></option>
+            <% }) %>
+          </select>
+          <label class="lbl-sm">Title <span style="font-weight:400;">(use {user}, {server}, {count})</span></label>
+          <input type="text" name="title" value="<%= welcomer.title %>">
+          <label class="lbl-sm">Description</label>
+          <textarea name="description"><%= welcomer.description %></textarea>
+          <div class="row2">
+            <div><label class="lbl-sm">Banner Image URL</label><input type="text" name="bannerUrl" value="<%= welcomer.bannerUrl %>"></div>

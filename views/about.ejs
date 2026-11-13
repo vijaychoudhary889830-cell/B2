@@ -1,0 +1,232 @@
+<%
+  const ICONS = {
+    shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    filter: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+    ticket: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+    smile: '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>',
+    user: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>',
+    music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'
+  };
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<title>About — SPIDEY</title>
+<meta name="description" content="SPIDEY is a Discord bot for server security: anti-nuke, AutoMod, tickets, reaction roles, welcomer and music, managed from one dashboard.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #08060a; --ink2: #0f0c12; --panel: #130f16; --line: rgba(255,255,255,0.09);
+    --red: #ff3b4e; --red-soft: #ff8a96; --ice: #8fd8ff; --ok: #3ddc84;
+    --text: #f5f1f3; --muted: #a79fa6;
+    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--text); font-family: var(--body); line-height: 1.55; min-height: 100vh;
+    background: radial-gradient(900px 520px at 8% -8%, rgba(255,59,78,0.20), transparent 60%), var(--ink);
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; border-radius: 6px; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; max-width: 1120px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 19px; text-decoration: none; }
+  .brand-logo { width: 32px; height: 32px; border-radius: 9px; object-fit: cover; border: 1px solid var(--line); }
+  .nav-links { display: flex; align-items: center; gap: 26px; }
+  .nav-links a { text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); transition: color .15s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--text); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 20px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; border: 1px solid transparent; transition: transform .15s, background .15s, border-color .15s; }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--red); color: #1a0306; }
+  .btn-primary:hover { background: #ff5566; }
+  .nav-links a.btn-primary { color: #1a0306; }
+  .btn-ghost { border-color: var(--line); color: var(--text); background: rgba(255,255,255,0.03); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.28); }
+  .hamburger { display: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); color: var(--text); font-size: 18px; cursor: pointer; }
+
+  .drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 30; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 270px; z-index: 40; background: var(--ink2); border-left: 1px solid var(--line); padding: 22px 20px; transform: translateX(100%); transition: transform .25s ease; display: flex; flex-direction: column; gap: 2px; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-overlay.open { display: block; }
+  .drawer a { text-decoration: none; padding: 13px 6px; font-weight: 500; font-size: 15px; border-bottom: 1px solid var(--line); }
+  .drawer .btn { margin-top: 16px; border: none; }
+  .drawer-close { align-self: flex-end; background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; margin-bottom: 8px; }
+  @media (max-width: 760px) { .nav-links { display: none; } .hamburger { display: block; } }
+
+  .hero { padding: 56px 0 34px; text-align: center; }
+  .eyebrow { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--red-soft); margin-bottom: 14px; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 14px; }
+  .lead { color: var(--muted); font-size: 16px; max-width: 540px; margin: 0 auto 26px; }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0 8px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+  .card p { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+  .card a.link { color: var(--red-soft); font-size: 13.5px; font-weight: 700; text-decoration: none; }
+  .card a.link:hover { text-decoration: underline; }
+
+  h2 { font-family: var(--display); font-size: 24px; font-weight: 800; margin: 46px 0 14px; }
+  .fix { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 20px; }
+  .fix .row { padding: 16px 0; border-top: 1px solid var(--line); }
+  .fix .row:first-child { border-top: none; }
+  .fix h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+  .fix p { margin: 0; color: var(--muted); font-size: 14px; }
+  code { background: rgba(255,255,255,0.07); border-radius: 5px; padding: 1px 6px; font-size: 13px; color: var(--ice); }
+
+  details.faq { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; }
+  details.faq summary { list-style: none; cursor: pointer; padding: 16px 18px; font-weight: 700; font-size: 14.5px; display: flex; justify-content: space-between; gap: 12px; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq .chev { color: var(--muted); transition: transform .15s ease; flex-shrink: 0; }
+  details.faq[open] .chev { transform: rotate(180deg); }
+  details.faq .ans { padding: 0 18px 16px; color: var(--muted); font-size: 14px; }
+
+  .help-cta { margin: 46px 0 0; text-align: center; background: linear-gradient(180deg, rgba(255,59,78,0.12), rgba(255,59,78,0.03)); border: 1px solid rgba(255,59,78,0.28); border-radius: 16px; padding: 30px 22px; }
+  .help-cta h2 { margin: 0 0 8px; font-size: 22px; }
+  .help-cta p { color: var(--muted); margin: 0 auto 18px; max-width: 460px; font-size: 14.5px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; counter-reset: s; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; counter-increment: s; }
+  .step::before { content: counter(s); display: inline-flex; width: 26px; height: 26px; border-radius: 8px; background: rgba(255,59,78,0.16); color: var(--red-soft); font-weight: 800; font-size: 13px; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .step h3 { margin: 0 0 4px; font-size: 15px; }
+  .step p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .list { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+  .list li { margin: 6px 0; }
+  .notice { border: 1px solid rgba(143,216,255,0.28); background: rgba(143,216,255,0.06); border-radius: 12px; padding: 14px 16px; color: var(--muted); font-size: 13.5px; margin-top: 14px; }
+  .notice b { color: var(--text); }
+  footer { margin-top: 70px; border-top: 1px solid var(--line); padding: 26px 0; color: var(--muted); font-size: 13px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer .wrap > div:last-child { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  footer a { text-decoration: none; margin-left: 0; }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 760px) { .grid, .steps, .two { grid-template-columns: 1fr; } .hero { padding-top: 36px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } html { scroll-behavior: auto; } }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  .stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 800; line-height: 1.1; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px 1px rgba(61,220,132,0.7); flex-shrink: 0; }
+  .dot::before, .dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--ok); animation: livePing 2s cubic-bezier(0,0,.2,1) infinite; }
+  .dot::after { animation-delay: 1s; }
+  .dot.off { background: var(--red); box-shadow: none; } .dot.off::before, .dot.off::after { display: none; }
+  @keyframes livePing { 0% { transform: scale(1); opacity: .6; } 80%, 100% { transform: scale(3.4); opacity: 0; } }
+  .ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,59,78,0.14); color: var(--red-soft); margin-bottom: 12px; }
+  .grid.four { grid-template-columns: repeat(3, 1fr); }
+  .steps.four { grid-template-columns: repeat(4, 1fr); }
+  .lede { color: var(--muted); max-width: 640px; margin: -4px 0 16px; font-size: 15px; }
+  @media (max-width: 760px) { .stats { grid-template-columns: 1fr 1fr; } .grid.four, .steps.four { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .dot::before, .dot::after { animation: none; opacity: 0; } }
+  /* Shop icon, top right */
+  .nav-actions { display: flex; align-items: center; gap: 10px; }
+  .nav-icon { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); color: var(--text); display: flex; align-items: center; justify-content: center; text-decoration: none; transition: border-color .15s, color .15s; }
+  .nav-icon:hover { border-color: rgba(255,59,78,0.6); color: var(--red-soft); }
+</style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt=""> SPIDEY</a>
+    <div class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/status">Status</a>
+      <a href="/about" class="on">About</a>
+      <a href="/documentation">Docs</a>
+      <a href="/support">Support</a>
+      <% if (user) { %><a href="/dashboard" class="btn btn-primary">Open dashboard</a>
+      <% } else { %><a href="/login" class="btn btn-primary">Log in with Discord</a><% } %>
+    </div>
+    <div class="nav-actions"><%- include('partials/home-btn') %><a class="nav-icon" href="/shop" aria-label="Shop" title="Shop"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></a><button class="hamburger" aria-label="Open menu" onclick="toggleDrawer(true)">☰</button></div>
+  </nav>
+
+  <div class="drawer-overlay" id="overlay" onclick="toggleDrawer(false)"></div>
+  <div class="drawer" id="drawer">
+    <button class="drawer-close" aria-label="Close menu" onclick="toggleDrawer(false)">✕</button>
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/status">Status</a>
+    <a href="/about">About</a>
+    <a href="/documentation">Documentation</a>
+    <a href="/support">Support</a>
+    <% if (user) { %><a href="/dashboard" class="btn btn-primary">Open dashboard</a>
+    <% } else { %><a href="/login" class="btn btn-primary">Log in with Discord</a><% } %>
+  </div>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="live"><span class="dot <%= isOnline ? '' : 'off' %>"></span><%= isOnline ? 'Online now' : 'Offline right now' %></div>
+      <h1>A security bot that stays out of your way.</h1>
+      <p class="lead">SPIDEY watches your Discord server for the things that ruin it, like mass bans, channel wipes and raids, and stops them. Everything is managed from one dashboard.</p>
+      <div class="cta">
+        <% if (inviteUrl) { %><a class="btn btn-primary" href="<%= inviteUrl %>" target="_blank" rel="noopener">Add SPIDEY</a><% } %>
+        <a class="btn <%= inviteUrl ? 'btn-ghost' : 'btn-primary' %>" href="/documentation">Read the docs</a>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><b><%= guildCount.toLocaleString() %></b><span>Servers protected</span></div>
+      <div class="stat"><b><%= totalUsers.toLocaleString() %></b><span>Members watched</span></div>
+      <div class="stat"><b><%= eventCount %></b><span>Antinuke events covered</span></div>
+      <div class="stat"><b><%= commandCount %></b><span>Slash commands</span></div>
+    </section>
+
+    <h2>What it does</h2>
+    <p class="lede">Security comes first, and the rest is there so you don't need five different bots.</p>
+    <div class="grid four">
+      <% [
+        ['shield','Antinuke','Tracks bans, kicks, channel and role changes, webhooks and more, and punishes anyone who goes past your limit.'],
+        ['filter','AutoMod','Spam, caps, banned words, invite links and raid detection, each with its own switch.'],
+        ['ticket','Tickets','Private support channels in one click, with a transcript saved when a ticket closes.'],
+        ['smile','Reaction roles','Post a panel, link emojis to roles, and members pick their own.'],
+        ['user','Welcomer and autorole','Greet new members and give them a starter role automatically.'],
+        ['music','Music','Play from YouTube and Spotify links, with queue controls and a 24/7 mode.']
+      ].forEach(f => { %>
+        <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><%- ICONS[f[0]] %></svg></div><h3><%= f[1] %></h3><p><%= f[2] %></p></div>
+      <% }) %>
+    </div>
+
+    <h2>How Antinuke works</h2>
+    <p class="lede">No guesswork. Each event has a limit you control.</p>
+    <div class="steps four">
+      <div class="step"><h3>Watch</h3><p>SPIDEY reads your server's audit log for risky actions as they happen.</p></div>
+      <div class="step"><h3>Count</h3><p>Repeated actions by the same person are counted over a short 15-second window.</p></div>
+      <div class="step"><h3>Act</h3><p>Past the limit, they're banned or kicked, whichever you set for that event.</p></div>
+      <div class="step"><h3>Log</h3><p>What happened is posted to the log channel you pick, so your team can see it.</p></div>
+    </div>
+    <div class="notice"><b>Your trusted people stay safe.</b> Whitelist staff you trust, or add extra owners, and SPIDEY leaves them alone.</div>
+
+    <h2>What we care about</h2>
+    <div class="grid">
+      <div class="card"><h3>You stay in control</h3><p>Every module has its own switch and limits. Nothing is on or off unless you chose it.</p></div>
+      <div class="card"><h3>Straight answers</h3><p>The <a class="link" href="/status">status page</a> shows real uptime and ping, and the <a class="link" href="/documentation">docs</a> list every command.</p></div>
+      <div class="card"><h3>Real people to ask</h3><p>Stuck or found a bug? Our <a class="link" href="/support">support page</a> has quick fixes and a way to reach us.</p></div>
+    </div>
+
+    <section class="help-cta">
+      <h2>Ready to lock your server down?</h2>
+      <p>Add SPIDEY, move its role near the top, and switch on Antinuke from the dashboard. It takes a couple of minutes.</p>
+      <a class="btn btn-primary" href="<%= user ? '/dashboard' : '/login' %>"><%= user ? 'Open dashboard' : 'Log in with Discord' %></a>
+    </section>
+  </main>
+
+  <%- include('partials/site-footer') %>
+
+  <script>
+    function toggleDrawer(open) {
+      document.getElementById('drawer').classList.toggle('open', open);
+      document.getElementById('overlay').classList.toggle('open', open);
+    }
+  </script>
+</body>
+</html>
