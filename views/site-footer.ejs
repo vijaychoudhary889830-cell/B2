@@ -1,0 +1,37 @@
+<style>
+  .sf { margin-top: 72px; border-top: 1px solid var(--line, rgba(255,255,255,0.09)); background: linear-gradient(180deg, rgba(255,59,78,0.05), transparent 55%); color: var(--muted, #a79fa6); font-size: 14px; }
+  .sf-in { max-width: 1120px; margin: 0 auto; padding: 40px 24px 28px; }
+  .sf-top { display: grid; grid-template-columns: 1.4fr 2fr; gap: 36px; }
+  .sf-brand { display: flex; align-items: center; gap: 10px; font-family: var(--display, system-ui); font-weight: 800; font-size: 20px; color: var(--text, #f5f1f3); text-decoration: none; }
+  .sf-brand img { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; border: 1px solid var(--line, rgba(255,255,255,0.09)); }
+  .sf-blurb { margin: 12px 0 16px; max-width: 32ch; line-height: 1.55; }
+  .sf-cta { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,59,78,0.5); color: var(--text, #f5f1f3); font-weight: 700; font-size: 14px; text-decoration: none; background: rgba(255,59,78,0.10); }
+  .sf-cta:hover { background: rgba(255,59,78,0.18); }
+  .sf-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .sf-cols h3 { margin: 0 0 12px; font-family: var(--display, system-ui); font-size: 15px; font-weight: 800; color: var(--text, #f5f1f3); }
+  .sf-cols a { display: block; padding: 5px 0; color: var(--muted, #a79fa6); text-decoration: none; }
+  .sf-cols a:hover { color: var(--text, #f5f1f3); }
+  .sf-bottom { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--line, rgba(255,255,255,0.09)); display: flex; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; font-size: 12.5px; }
+  @media (max-width: 760px) { .sf-top { grid-template-columns: 1fr; gap: 28px; } .sf-in { padding: 32px 20px 24px; } }
+  @media (max-width: 380px) { .sf-cols { grid-template-columns: 1fr 1fr; } }
+</style>
+<div class="sf" role="contentinfo">
+  <div class="sf-in">
+    <div class="sf-top">
+      <div>
+        <a class="sf-brand" href="/"><img src="/logo.png" alt=""> SPIDEY</a>
+        <p class="sf-blurb">A Discord bot for moderation, music and welcome tools, built to keep your server safe.</p>
+        <a class="sf-cta" href="/shop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>See Premium plans</a>
+      </div>
+      <div class="sf-cols">
+        <div><h3>Product</h3><a href="/dashboard">Dashboard</a><a href="/shop">Shop</a><a href="/documentation">Docs</a><a href="/status">Status</a></div>
+        <div><h3>Help</h3><a href="/about">About</a><a href="/support">Support</a><a href="/contact">Contact</a></div>
+        <div><h3>Legal</h3><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/refund">Refunds</a></div>
+      </div>
+    </div>
+    <div class="sf-bottom">
+      <span>&copy; <%= new Date().getFullYear() %> SPIDEY. All rights reserved.</span>
+      <span>SPIDEY isn't affiliated with or endorsed by Discord Inc.</span>
+    </div>
+  </div>
+</div>

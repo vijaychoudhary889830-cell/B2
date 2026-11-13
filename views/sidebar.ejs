@@ -1,0 +1,97 @@
+<style>
+  /* ── Sidebar layout (scoped to .sidebar; nothing else on the page changes) ── */
+  .sidebar {
+    width: min(290px, 84vw); padding: 16px 14px 18px; gap: 0;
+    background: #0b090d;
+    border-right: 1px solid var(--border);
+    font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+    scrollbar-width: thin; scrollbar-color: rgba(255,59,78,0.35) transparent;
+  }
+  @media (min-width: 901px) { .sidebar { width: 264px; background: #0b090d; } }
+  .sidebar .sidebar-close { color: var(--red2); margin-bottom: 0; font-size: 18px; }
+  .sidebar .side-brand { display: flex; align-items: center; gap: 11px; padding: 2px 6px 14px; font-weight: 800; font-size: 15px; letter-spacing: .04em; color: #ffffff; }
+  .sidebar .brand-logo-box {
+    width: 40px; height: 40px; flex-shrink: 0; padding: 2px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--red2), var(--red));
+    box-shadow: 0 4px 14px rgba(255,59,78,0.35);
+  }
+  .sidebar .brand-logo-box img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 10px; }
+
+  .sidebar .side-server {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; margin: 0 0 6px;
+    background: rgba(255,59,78,0.10); border: 1px solid rgba(255,59,78,0.38); border-radius: 12px;
+  }
+  .sidebar .side-server img, .sidebar .side-server .ph {
+    width: 34px; height: 34px; border-radius: 9px; object-fit: cover; flex-shrink: 0;
+    background: var(--card2); color: var(--red2); font-weight: 800; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sidebar .side-server-text { flex: 1; min-width: 0; line-height: 1.25; }
+  .sidebar .side-server-kicker { font-size: 9.5px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+  .sidebar .side-server-name { font-size: 13.5px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar .side-swap { color: var(--red2); background: none; border: none; width: auto; height: auto; font-size: 17px; text-decoration: none; padding: 0 2px; }
+  .sidebar .all-servers { display: block; padding: 6px 12px 10px; font-size: 12px; font-weight: 700; color: var(--red2); text-decoration: none; }
+  .sidebar .all-servers:hover { color: var(--red2); }
+
+  .sidebar .side-actions { flex-direction: row; gap: 6px; margin: 0 0 4px; }
+  .sidebar .side-actions .side-action-btn { width: 100%; justify-content: center; font-family: inherit; font-size: 11px; padding: 8px 6px; border-radius: 9px; }
+  .sidebar .side-actions > a.side-action-btn { flex: 1; }
+  .sidebar .side-action-btn.audit { background: rgba(255,59,78,0.10); color: var(--red2); border: 1px solid rgba(255,59,78,0.30); }
+
+  .sidebar .side-label { font-size: 10px; letter-spacing: .14em; color: #7f93ab; padding: 16px 12px 6px; font-weight: 800; }
+  .sidebar .nav-item {
+    gap: 12px; padding: 10px 12px; margin: 1px 0; border-radius: 10px; border: 1px solid transparent; border-left: 1px solid transparent;
+    color: #cfe4ff; font-size: 13.5px; font-weight: 600; letter-spacing: .01em;
+  }
+  .sidebar .nav-item .ic { width: 20px; height: 20px; background: none; border-radius: 0; color: var(--red2); }
+  .sidebar .nav-item .ic svg { width: 17px; height: 17px; }
+  .sidebar .nav-item:hover { background: rgba(255,59,78,0.10); color: #fff; }
+  .sidebar .nav-item.active {
+    background: linear-gradient(90deg, rgba(255,59,78,0.34), rgba(255,59,78,0.12));
+    border-color: rgba(255,59,78,0.65); color: #fff; box-shadow: 0 0 0 1px rgba(255,59,78,0.08) inset, 0 6px 18px rgba(255,59,78,0.18);
+  }
+  .sidebar .nav-item.active .ic { background: none; color: #ffffff; }
+  .sidebar .sidebar-foot { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid rgba(255,59,78,0.14); }
+  .sidebar .sidebar-foot a { color: #cfe4ff; font-size: 12.5px; font-weight: 700; }
+</style>
+  <div class="drawer-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <button class="sidebar-close" onclick="toggleSidebar(false)">✕</button>
+      <div class="side-brand"><span class="brand-logo-box"><img src="/logo.png" alt="SPIDEY"></span> SPIDEY</div>
+
+      <div class="side-server">
+        <% if (typeof guildIconUrl !== 'undefined' && guildIconUrl) { %><img src="<%= guildIconUrl %>" alt="">
+        <% } else { %><div class="ph"><%= (typeof guildName !== 'undefined' && guildName ? guildName : '?').slice(0,2).toUpperCase() %></div><% } %>
+        <div class="side-server-text">
+          <div class="side-server-kicker">Server</div>
+          <div class="side-server-name"><%= typeof guildName !== 'undefined' ? guildName : '' %></div>
+        </div>
+        <a href="/dashboard" class="side-swap" title="Switch server">&#8646;</a>
+      </div>
+      <a href="/dashboard" class="all-servers">All servers &rarr;</a>
+
+      <div class="side-actions">
+        <a href="https://discord.com/channels/<%= guildId %>/audit-log" target="_blank" rel="noopener noreferrer" class="side-action-btn audit"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;flex-shrink:0;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Audit Logs</a>
+      </div>
+
+      <div class="side-label">Server</div>
+      <a href="/dashboard/<%= guildId %>" class="nav-item <%= activeModule === 'overview' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Overview</a>
+      <div class="side-label">Manage</div>
+      <a href="/dashboard/<%= guildId %>/automod" class="nav-item <%= activeModule === 'automod' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span> AutoMod</a>
+      <a href="/dashboard/<%= guildId %>/antinuke" class="nav-item <%= activeModule === 'antinuke' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span> Antinuke</a>
+      <a href="/dashboard/<%= guildId %>/logging" class="nav-item <%= activeModule === 'logging' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span> Logging</a>
+      <div class="side-label">Community</div>
+      <a href="/dashboard/<%= guildId %>/welcomer" class="nav-item <%= activeModule === 'welcomer' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg></span> Welcomer</a>
+      <a href="/dashboard/<%= guildId %>/reactionroles" class="nav-item <%= activeModule === 'reactionroles' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg></span> Reaction Roles</a>
+      <a href="/dashboard/<%= guildId %>/tickets" class="nav-item <%= activeModule === 'tickets' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></span> Tickets</a>
+      <a href="/dashboard/<%= guildId %>/giveaways" class="nav-item <%= activeModule === 'giveaways' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></span> Giveaways</a>
+      <a href="/dashboard/<%= guildId %>/autorole" class="nav-item <%= activeModule === 'autorole' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg></span> Autorole</a>
+      <div class="side-label">Configuration</div>
+      <a href="/dashboard/<%= guildId %>/customize" class="nav-item <%= activeModule === 'customize' ? 'active' : '' %>"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span> Bot Profile</a>
+      <a href="/shop" class="nav-item"><span class="ic"><svg class="i" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:0px;flex-shrink:0;margin:0;vertical-align:middle"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span> Shop</a>
+
+      <div class="sidebar-foot"><a href="/logout">Log Out</a></div>
+    </div>
+
+    <div class="main">

@@ -1,0 +1,19 @@
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar(open) {
+      document.getElementById('sidebar').classList.toggle('open', open);
+      document.getElementById('sidebarOverlay').classList.toggle('open', open);
+      document.documentElement.classList.toggle('drawer-open', open);
+      document.body.classList.toggle('drawer-open', open);
+    }
+
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '✅';
+        setTimeout(() => { btn.textContent = original; }, 1200);
+      }).catch(() => {});
+    }
+  </script>

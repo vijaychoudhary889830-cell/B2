@@ -1,0 +1,175 @@
+<style>
+  .md-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
+  .md-toolbar button {
+    min-width: 34px; height: 32px; padding: 0 9px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border); background: #1b1219; color: #fff;
+    font-size: 13px; font-weight: 700; font-family: inherit;
+  }
+  .md-toolbar button:hover { background: #3a0810; }
+  .md-hint { font-size: 11px; color: var(--muted); margin: 4px 0 0; }
+
+  .ep-wrap { margin-top: 14px; }
+  .ep-label { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .ep-msg { background: #313338; border-radius: 10px; padding: 14px; color: #dbdee1; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+  .ep-bot { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .ep-bot img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+  .ep-bot b { color: #fff; font-size: 14px; }
+  .ep-tag { background: #5865f2; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; }
+  .ep-ping { margin-bottom: 6px; }
+  .ep-embed { display: flex; gap: 12px; justify-content: space-between; background: #2b2d31; border-left: 4px solid #38a3ff; border-radius: 6px; padding: 10px 12px; max-width: 480px; }
+  .ep-body { min-width: 0; flex: 1; }
+  .ep-title { color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .ep-desc { font-size: 13.5px; }
+  .ep-image { width: 100%; max-height: 180px; object-fit: cover; border-radius: 6px; margin-top: 10px; display: block; }
+  .ep-footer { margin-top: 10px; font-size: 11.5px; color: #b5bac1; }
+  .ep-thumb { width: 56px; height: 56px; border-radius: 50%; background: #4e5058; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .ep-btns { margin-top: 8px; }
+  .ep-btn { display: inline-block; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #fff; }
+  .ep-btn.primary { background: #5865f2; }
+  .ep-btn.danger { background: #da373c; }
+  .ep-empty { color: #80848e; font-style: italic; font-size: 13px; }
+  .ep-msg a { color: #00a8fc; text-decoration: none; }
+  .ep-msg code { background: #1e1f22; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .ep-msg pre.md-code { background: #1e1f22; padding: 8px 10px; border-radius: 6px; margin: 6px 0; white-space: pre-wrap; font-size: 12.5px; }
+  .ep-msg .md-quote { border-left: 3px solid #4e5058; padding-left: 10px; margin: 2px 0; }
+  .ep-msg .md-mention { background: rgba(88,101,242,0.3); color: #c9cdfb; padding: 0 3px; border-radius: 3px; }
+</style>
+
+<script>
+/*MD-START*/
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Renders Discord-style markdown to safe HTML (input is escaped first).
+function renderMd(src) {
+  var t = escHtml(src || '');
+  var blocks = [];
+  var inl = [];
+  t = t.replace(/```([\s\S]*?)```/g, function (m, c) {
+    blocks.push('<pre class="md-code">' + c.replace(/^\n/, '') + '</pre>');
+    return '\u0000B' + (blocks.length - 1) + '\u0000';
+  });
+  t = t.replace(/`([^`\n]+)`/g, function (m, c) {
+    inl.push('<code>' + c + '</code>');
+    return '\u0000I' + (inl.length - 1) + '\u0000';
+  });
+  t = t.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  t = t.replace(/&lt;a?:(\w+):\d+&gt;/g, ':$1:');
+  t = t.replace(/\*\*([\s\S]+?)\*\*/g, '<b>$1</b>');
+  t = t.replace(/__([\s\S]+?)__/g, '<u>$1</u>');
+  t = t.replace(/~~([\s\S]+?)~~/g, '<s>$1</s>');
+  t = t.replace(/\*([^*\n]+?)\*/g, '<i>$1</i>');
+  t = t.replace(/(^|[^\w])_([^_\n]+?)_(?=[^\w]|$)/g, '$1<i>$2</i>');
+  t = t.replace(/\{user\}/g, '<span class="md-mention">@Spidey Fan</span>');
+  t = t.replace(/\{server\}/g, 'Your Server');
+  t = t.replace(/\{count\}/g, '128');
+  t = t.split('\n').map(function (line) {
+    if (/^&gt; /.test(line)) return '<div class="md-quote">' + line.slice(5) + '</div>';
+    if (/^[-*] /.test(line)) return '\u2022 ' + line.slice(2);
+    return line + '<br>';
+  }).join('').replace(/<br>$/, '');
+  t = t.replace(/\u0000I(\d+)\u0000/g, function (m, i) { return inl[+i]; });
+  t = t.replace(/\u0000B(\d+)\u0000/g, function (m, i) { return blocks[+i]; });
+  return t;
+}
+/*MD-END*/
+
+(function () {
+  function field(name) {
+    return name ? document.querySelector('[name="' + name + '"]') : null;
+  }
+  function val(name) {
+    var el = field(name);
+    return el ? el.value : '';
+  }
+
+  // ---- Formatting toolbar on every textarea marked data-md ----
+  function wrap(ta, before, after, placeholder) {
+    var s = ta.selectionStart, e = ta.selectionEnd;
+    var sel = ta.value.slice(s, e) || placeholder;
+    ta.setRangeText(before + sel + after, s, e, 'end');
+    ta.focus();
+    ta.setSelectionRange(s + before.length, s + before.length + sel.length);
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  function prefixLines(ta, prefix) {
+    var s = ta.selectionStart, e = ta.selectionEnd;
+    var start = ta.value.lastIndexOf('\n', s - 1) + 1;
+    var block = ta.value.slice(start, e) || '';
+    var out = block.split('\n').map(function (l) { return prefix + l; }).join('\n');
+    ta.setRangeText(out, start, e, 'end');
+    ta.focus();
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  var tools = [
+    { label: 'B', title: 'Bold', run: function (ta) { wrap(ta, '**', '**', 'bold text'); } },
+    { label: 'I', title: 'Italic', run: function (ta) { wrap(ta, '*', '*', 'italic text'); } },
+    { label: 'U', title: 'Underline', run: function (ta) { wrap(ta, '__', '__', 'underlined'); } },
+    { label: 'S', title: 'Strikethrough', run: function (ta) { wrap(ta, '~~', '~~', 'struck'); } },
+    { label: '</>', title: 'Code', run: function (ta) { wrap(ta, '`', '`', 'code'); } },
+    { label: '\u275D', title: 'Quote', run: function (ta) { prefixLines(ta, '> '); } },
+    { label: '\u2022', title: 'Bullet list', run: function (ta) { prefixLines(ta, '- '); } },
+    { label: '\uD83D\uDD17', title: 'Link', run: function (ta) {
+        var url = window.prompt('Link URL (starts with https://)');
+        if (!url) return;
+        wrap(ta, '[', '](' + url.trim() + ')', 'link text');
+      } },
+  ];
+
+  document.querySelectorAll('textarea[data-md]').forEach(function (ta) {
+    var bar = document.createElement('div');
+    bar.className = 'md-toolbar';
+    tools.forEach(function (tool) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = tool.label;
+      b.title = tool.title;
+      b.addEventListener('click', function () { tool.run(ta); });
+      bar.appendChild(b);
+    });
+    ta.parentNode.insertBefore(bar, ta);
+  });
+
+  // ---- Live previews ----
+  document.querySelectorAll('.embed-preview').forEach(function (box) {
+    var d = box.dataset;
+
+    function render() {
+      var title = d.fixedTitle || val(d.titleField) || d.fallbackTitle || '';
+      var desc = val(d.descField) || d.fallbackDesc || '';
+      var footer = val(d.footerField);
+      var image = val(d.imageField);
+      var color = val(d.colorField) || '#38a3ff';
+      var button = d.buttonField !== undefined ? (val(d.buttonField) || d.fallbackButton || 'Open') : '';
+      var empty = !title && !desc && !image;
+
+      var html = '<div class="ep-msg"><div class="ep-bot"><img src="/logo.png" alt=""><b>SPIDEY</b><span class="ep-tag">BOT</span></div>';
+      if (d.ping) html += '<div class="ep-ping"><span class="md-mention">@Spidey Fan</span></div>';
+
+      if (empty) {
+        html += '<div class="ep-empty">Nothing here yet. Start typing above and it shows up here.</div>';
+      } else {
+        html += '<div class="ep-embed" style="border-left-color:' + escHtml(color) + '"><div class="ep-body">';
+        if (title) html += '<div class="ep-title">' + renderMd(title) + '</div>';
+        if (desc) html += '<div class="ep-desc">' + renderMd(desc) + '</div>';
+        if (image && /^https?:\/\//i.test(image)) html += '<img class="ep-image" src="' + escHtml(image) + '" alt="">';
+        if (footer) html += '<div class="ep-footer">' + renderMd(footer) + '</div>';
+        html += '</div>';
+        if (d.thumb) html += '<div class="ep-thumb">\uD83D\uDE42</div>';
+        html += '</div>';
+      }
+      if (button) html += '<div class="ep-btns"><span class="ep-btn ' + (d.buttonStyle || 'primary') + '">' + escHtml(d.buttonIcon || '') + ' ' + escHtml(button) + '</span></div>';
+      html += '</div>';
+      box.innerHTML = '<div class="ep-wrap"><div class="ep-label">' + escHtml(d.label || 'Live preview') + '</div>' + html + '</div>';
+    }
+
+    [d.titleField, d.descField, d.footerField, d.imageField, d.colorField, d.buttonField].forEach(function (n) {
+      var el = field(n);
+      if (el) el.addEventListener('input', render);
+    });
+    render();
+  });
+})();
+</script>
